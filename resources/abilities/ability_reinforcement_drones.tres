@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/AbilityData.gd" id="1_ability"]
+
+[resource]
+script = ExtResource("1_ability")
+id = "reinforcement_drones"
+display_name = "Reinforcement Drones"
+description = "Deploys two autonomous gun drones over a road section for fourteen seconds."
+cooldown = 46
+uses_per_level = -1
+target_mode = "area"
+radius = 150
+delay = 0
+damage = 22
+damage_type = "kinetic"
+duration = 14.0
+stun_duration = 0
+slow_amount = 0
+credits = 0
+heal_amount = 0
+shortcut = "E"
+color = Color(0.55, 0.95, 0.6, 1)

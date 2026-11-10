@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 220
+display_name = "Tungsten Slug"
+description = "Denser round with better armour defeat."
+damage_add = 45
+armor_pen_add = 0.1
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 330
+display_name = "Extended Rails"
+description = "Longer accelerator stretches the kill zone."
+damage_add = 70
+range_add = 40
+special_note = "Critical hits deal extra damage."
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 500
+display_name = "Executioner Rounds"
+description = "Finishes wounded elites in a single shot."
+damage_add = 120
+armor_pen_add = 0.15
+range_add = 40
+special_note = "Bonus damage against wounded targets."
+
+[resource]
+script = ExtResource("1_tower")
+id = "rail"
+display_name = "Rail Sniper"
+role = "Long-range precision"
+description = "Hypervelocity rail shot. Deletes high-value targets before they reach the base."
+cost = 300
+sell_ratio = 0.7
+max_level = 4
+damage_type = "kinetic"
+damage = 100
+attack_rate = 0.35
+attack_range = 380
+projectile_speed = 0
+splash_radius = 0
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0.7
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = true
+can_target_ground = true
+crit_chance = 0.15
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = ""
+scene_path = "res://scenes/towers/TowerRail.tscn"
+visual_style = "rail"
+primary_color = Color(0.86, 0.9, 0.95, 1)
+shortcut = "7"
+tip = "Hypervelocity rail shot. Deletes high-value targets before they reach the base."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

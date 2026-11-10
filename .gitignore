@@ -1,101 +1,26 @@
-# Общие системные файлы
+# Godot cache and editor data
+.godot/
+/android/
+
+# Local exports, builds and archives
+export.cfg
+*.translation
+build/
+exports/
+*.exe
+*.zip
+
+# Local logs and temporary files
+*.log
+*.tmp
+*_test_*.png
+!tests/web_*.png
+
+# OS/editor noise
 .DS_Store
 Thumbs.db
-
-# Редакторы кода
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Окружение и зависимости
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-node_modules/
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Логи
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Тестовые покрытия
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Операционные системы
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-# Windows
-Desktop.ini
-# Linux
-*~
-
-# Docker
-.docker/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
-# Временные файлы
-tmp/
-temp/
-
-# Безопасность
-secrets.ini
-config.ini
-credentials.json
-service_account.json
-
-# Билды
-dist/
-build/
-out/
-target/
-
-# Документация
-docs/_build/
-docs/source/generated/
-
-# Прочее
-*.tmp
-*.temp
-.cache/
+# The Web export in web/ IS committed on purpose: it is what GitHub Pages serves.
+# Keep export_presets.cfg committed too; it contains no signing keys.

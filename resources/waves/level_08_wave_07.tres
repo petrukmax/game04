@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "warrior"
+count = 14
+path = 0
+interval = 0.55
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "burrower"
+count = 8
+path = 1
+interval = 1.0
+delay = 0.6
+
+[sub_resource type="Resource" id="Spawn_3"]
+script = ExtResource("2_spawn")
+enemy_id = "flyer"
+count = 6
+path = 1
+interval = 1.0
+delay = 4.0
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 7
+display_name = "Wave 7"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2"), SubResource("Spawn_3")]
+completion_bonus = 87
+boss_wave = false
+preview = "Chitin Warrior x14 • Burrower x8 • Rift Flyer x6"

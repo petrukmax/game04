@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "worker"
+count = 16
+path = 0
+interval = 0.32
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "healer"
+count = 2
+path = 1
+interval = 2.0
+delay = 0.5
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 1
+display_name = "Wave 1"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2")]
+completion_bonus = 51
+boss_wave = false
+preview = "Regolith Worker x16 • Brood Weaver x2"

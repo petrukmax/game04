@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyData.gd" id="1_enemy"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = "burrower"
+display_name = "Burrower"
+role = "Ambusher"
+description = "Dives under the regolith and surfaces near the defences."
+max_health = 145
+speed = 86
+armor = 2
+bounty = 16
+leak_damage = 1
+spawn_weight = 1.0
+flying = false
+burrowed = true
+shield = 0
+shield_regen = 0
+shield_delay = 5.0
+heal_radius = 0
+heal_amount = 0
+heal_interval = 2.0
+ranged_range = 0
+ranged_interval = 4.0
+is_elite = false
+is_boss = false
+scene_path = "res://scenes/enemies/EnemyBurrower.tscn"
+visual_style = "burrower"
+body_color = Color(0.55, 0.4, 0.22, 1)
+accent_color = Color(1.0, 0.75, 0.3, 1)
+body_scale = 0.98
+tip = "Dives under the regolith and surfaces near the defences."
+resistances = {"kinetic": 0.6, "explosive": 1.15, "fire": 1.0, "electric": 0.9, "frost": 1.0}
+immune_to = []

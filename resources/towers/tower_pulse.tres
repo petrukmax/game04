@@ -1,0 +1,77 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 80
+display_name = "Servo Tuning"
+description = "Faster tracking and a harder hitting bolt."
+damage_add = 7
+range_add = 15
+rate_add = 0.25
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 130
+display_name = "Armour Piercer"
+description = "Dense penetrator rounds ignore more plating."
+damage_add = 10
+range_add = 20
+rate_add = 0.3
+armor_pen_add = 0.15
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 210
+display_name = "Skyfire Barrels"
+description = "Specialised flak shells let the turret hit flyers."
+damage_add = 16
+range_add = 25
+rate_add = 0.4
+unlock_air = true
+special_note = "Can target flying enemies."
+
+[resource]
+script = ExtResource("1_tower")
+id = "pulse"
+display_name = "Pulse Turret"
+role = "Reliable single-target"
+description = "Compact twin-barrel kinetic turret. Cheap, fast and dependable on both roads."
+cost = 100
+sell_ratio = 0.7
+max_level = 4
+damage_type = "kinetic"
+damage = 14
+attack_rate = 1.8
+attack_range = 190
+projectile_speed = 800
+splash_radius = 0
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0.1
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = false
+can_target_ground = true
+crit_chance = 0.05
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = "res://scenes/towers/Projectile.tscn"
+scene_path = "res://scenes/towers/TowerPulse.tscn"
+visual_style = "pulse"
+primary_color = Color(0.95, 0.64, 0.24, 1)
+shortcut = "1"
+tip = "Compact twin-barrel kinetic turret. Cheap, fast and dependable on both roads."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/LevelData.gd" id="1_level"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_01.tres" id="w1"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_02.tres" id="w2"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_03.tres" id="w3"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_04.tres" id="w4"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_05.tres" id="w5"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_06.tres" id="w6"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_07.tres" id="w7"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_08.tres" id="w8"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_09.tres" id="w9"]
+[ext_resource type="Resource" path="res://resources/waves/level_10_wave_10.tres" id="w10"]
+
+[resource]
+script = ExtResource("1_level")
+id = "command_ridge"
+display_name = "Command Ridge"
+level_number = 10
+difficulty = "Medium"
+description = "Command Ridge is the last easy posting. Mixed waves hit both roads at once."
+starting_credits = 860
+base_health = 85
+completion_reward = 240
+interest_rate = 0.0
+grid_width = 22
+grid_height = 11
+build_margin = 2
+path_a = [Vector2(0, 2), Vector2(6, 2), Vector2(6, 6), Vector2(12, 6), Vector2(12, 2), Vector2(18, 2), Vector2(18, 6), Vector2(21, 6)]
+path_b = [Vector2(0, 9), Vector2(9, 9), Vector2(9, 3), Vector2(15, 3), Vector2(15, 9), Vector2(21, 9)]
+blocked_cells = [Vector2i(0, 0), Vector2i(1, 10), Vector2i(2, 0), Vector2i(2, 1), Vector2i(2, 6), Vector2i(3, 3), Vector2i(5, 1), Vector2i(5, 3), Vector2i(5, 4), Vector2i(6, 8), Vector2i(7, 4), Vector2i(8, 2), Vector2i(10, 1), Vector2i(10, 7), Vector2i(11, 1), Vector2i(12, 1), Vector2i(14, 9), Vector2i(15, 1), Vector2i(16, 4), Vector2i(16, 6), Vector2i(17, 7), Vector2i(19, 0), Vector2i(19, 2), Vector2i(19, 4), Vector2i(19, 10), Vector2i(20, 10), Vector2i(21, 0), Vector2i(21, 10)]
+available_towers = ["pulse", "siege", "flame", "tesla", "missile", "cryo", "rail", "relay", "mine", "orbital"]
+unlocked_abilities = ["orbital_strike", "emp", "reinforcement_drones", "emergency_repair", "supply_drop"]
+wave_data_list = [ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4"), ExtResource("w5"), ExtResource("w6"), ExtResource("w7"), ExtResource("w8"), ExtResource("w9"), ExtResource("w10")]
+environment_theme = "ridge"
+ground_color = Color(0.36, 0.18, 0.14, 1)
+dust_color = Color(0.8, 0.46, 0.34, 1)
+prop_seed = 110
+briefing = "Command Ridge is the last easy posting. Mixed waves hit both roads at once."

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/LevelData.gd" id="1_level"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_01.tres" id="w1"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_02.tres" id="w2"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_03.tres" id="w3"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_04.tres" id="w4"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_05.tres" id="w5"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_06.tres" id="w6"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_07.tres" id="w7"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_08.tres" id="w8"]
+[ext_resource type="Resource" path="res://resources/waves/level_06_wave_09.tres" id="w9"]
+
+[resource]
+script = ExtResource("1_level")
+id = "broken_pipeline"
+display_name = "Broken Pipeline"
+level_number = 6
+difficulty = "Medium"
+description = "Armoured shieldbearers guard the ruptured pipeline. Bring corrosion and splash."
+starting_credits = 780
+base_health = 95
+completion_reward = 190
+interest_rate = 0.0
+grid_width = 22
+grid_height = 11
+build_margin = 2
+path_a = [Vector2(0, 4), Vector2(9, 4), Vector2(9, 1), Vector2(13, 1), Vector2(13, 6), Vector2(21, 6)]
+path_b = [Vector2(0, 9), Vector2(9, 9), Vector2(9, 4), Vector2(16, 4), Vector2(16, 9), Vector2(21, 9)]
+blocked_cells = [Vector2i(0, 0), Vector2i(1, 10), Vector2i(2, 0), Vector2i(3, 5), Vector2i(3, 6), Vector2i(3, 7), Vector2i(4, 7), Vector2i(4, 8), Vector2i(5, 6), Vector2i(6, 7), Vector2i(6, 8), Vector2i(7, 6), Vector2i(7, 8), Vector2i(10, 2), Vector2i(11, 8), Vector2i(12, 7), Vector2i(15, 5), Vector2i(15, 9), Vector2i(17, 3), Vector2i(19, 0), Vector2i(19, 10), Vector2i(20, 10), Vector2i(21, 0), Vector2i(21, 10)]
+available_towers = ["pulse", "siege", "flame", "tesla", "missile", "cryo", "rail", "relay", "mine"]
+unlocked_abilities = ["orbital_strike", "emp", "reinforcement_drones", "emergency_repair", "supply_drop"]
+wave_data_list = [ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4"), ExtResource("w5"), ExtResource("w6"), ExtResource("w7"), ExtResource("w8"), ExtResource("w9")]
+environment_theme = "pipeline"
+ground_color = Color(0.38, 0.2, 0.15, 1)
+dust_color = Color(0.82, 0.5, 0.34, 1)
+prop_seed = 66
+briefing = "Armoured shieldbearers guard the ruptured pipeline. Bring corrosion and splash."

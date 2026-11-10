@@ -1,0 +1,8 @@
+# Keep exported binaries byte-exact on every platform.
+*.wasm binary
+*.pck binary
+*.png binary
+*.wav binary
+*.ico binary
+*.woff2 binary
+*.ttf binary

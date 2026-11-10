@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/LevelData.gd" id="1_level"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_01.tres" id="w1"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_02.tres" id="w2"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_03.tres" id="w3"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_04.tres" id="w4"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_05.tres" id="w5"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_06.tres" id="w6"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_07.tres" id="w7"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_08.tres" id="w8"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_09.tres" id="w9"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_10.tres" id="w10"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_11.tres" id="w11"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_12.tres" id="w12"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_13.tres" id="w13"]
+[ext_resource type="Resource" path="res://resources/waves/level_15_wave_14.tres" id="w14"]
+
+[resource]
+script = ExtResource("1_level")
+id = "first_bastion"
+display_name = "First Bastion"
+level_number = 15
+difficulty = "Very Hard"
+description = "The final assault of the Brood Tyrant. Full roster, full abilities, no mercy."
+starting_credits = 900
+base_health = 65
+completion_reward = 500
+interest_rate = 0.0
+grid_width = 22
+grid_height = 11
+build_margin = 2
+path_a = [Vector2(0, 5), Vector2(3, 5), Vector2(3, 1), Vector2(8, 1), Vector2(8, 9), Vector2(13, 9), Vector2(13, 3), Vector2(18, 3), Vector2(18, 7), Vector2(21, 7)]
+path_b = [Vector2(0, 3), Vector2(6, 3), Vector2(6, 7), Vector2(11, 7), Vector2(11, 1), Vector2(16, 1), Vector2(16, 5), Vector2(21, 5)]
+blocked_cells = [Vector2i(0, 0), Vector2i(1, 10), Vector2i(2, 0), Vector2i(2, 4), Vector2i(2, 7), Vector2i(2, 8), Vector2i(3, 7), Vector2i(3, 9), Vector2i(4, 9), Vector2i(5, 4), Vector2i(5, 6), Vector2i(5, 7), Vector2i(6, 9), Vector2i(7, 3), Vector2i(7, 5), Vector2i(7, 9), Vector2i(9, 2), Vector2i(9, 3), Vector2i(9, 5), Vector2i(10, 1), Vector2i(10, 2), Vector2i(11, 8), Vector2i(14, 2), Vector2i(15, 6), Vector2i(15, 9), Vector2i(16, 8), Vector2i(17, 7), Vector2i(19, 0), Vector2i(19, 3), Vector2i(19, 10), Vector2i(20, 10), Vector2i(21, 0), Vector2i(21, 10)]
+available_towers = ["pulse", "siege", "flame", "tesla", "missile", "cryo", "rail", "relay", "mine", "orbital"]
+unlocked_abilities = ["orbital_strike", "emp", "reinforcement_drones", "emergency_repair", "supply_drop"]
+wave_data_list = [ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4"), ExtResource("w5"), ExtResource("w6"), ExtResource("w7"), ExtResource("w8"), ExtResource("w9"), ExtResource("w10"), ExtResource("w11"), ExtResource("w12"), ExtResource("w13"), ExtResource("w14")]
+environment_theme = "bastion"
+ground_color = Color(0.36, 0.15, 0.11, 1)
+dust_color = Color(0.9, 0.42, 0.24, 1)
+prop_seed = 165
+briefing = "The final assault of the Brood Tyrant. Full roster, full abilities, no mercy."

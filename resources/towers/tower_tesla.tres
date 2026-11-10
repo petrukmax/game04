@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 160
+display_name = "Capacitor Bank"
+description = "Extra charge feeds one more chain."
+damage_add = 12
+chain_add = 1
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 240
+display_name = "Overcharge"
+description = "Faster discharge and a stronger stun field."
+damage_add = 18
+rate_add = 0.15
+chain_add = 1
+special_note = "Improved stun chance."
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 360
+display_name = "Storm Crown"
+description = "A crown of coils chains through entire swarms."
+damage_add = 30
+chain_add = 2
+special_note = "Chains to five targets."
+
+[resource]
+script = ExtResource("1_tower")
+id = "tesla"
+display_name = "Arc Coil"
+role = "Chain lightning"
+description = "Arcs of static leap between nearby enemies. One of the few early anti-air towers."
+cost = 220
+sell_ratio = 0.7
+max_level = 4
+damage_type = "electric"
+damage = 30
+attack_rate = 0.9
+attack_range = 205
+projectile_speed = 0
+splash_radius = 0
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0
+chain_count = 2
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = true
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0.15
+stun_duration = 0.35
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = ""
+scene_path = "res://scenes/towers/TowerTesla.tscn"
+visual_style = "tesla"
+primary_color = Color(0.4, 0.78, 1.0, 1)
+shortcut = "4"
+tip = "Arcs of static leap between nearby enemies. One of the few early anti-air towers."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

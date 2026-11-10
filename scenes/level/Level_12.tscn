@@ -1,0 +1,36 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/LevelBase.gd" id="res_LevelBase"]
+[ext_resource type="Resource" path="res://resources/levels/level_12.tres" id="res_level_12"]
+[ext_resource type="Script" path="res://scripts/core/TerrainView.gd" id="res_TerrainView"]
+[ext_resource type="Script" path="res://scripts/core/PathNetwork.gd" id="res_PathNetwork"]
+[ext_resource type="Script" path="res://scripts/core/GridOverlay.gd" id="res_GridOverlay"]
+[ext_resource type="Script" path="res://scripts/core/SpawnGate.gd" id="res_SpawnGate"]
+[ext_resource type="Script" path="res://scripts/core/BaseCore.gd" id="res_BaseCore"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="res_HUD"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="res_PauseMenu"]
+[node name="Level_12" type="Node2D"]
+script = ExtResource("res_LevelBase")
+level_data = ExtResource("res_level_12")
+
+[node name="Terrain" type="Node2D" parent="."]
+script = ExtResource("res_TerrainView")
+
+[node name="PathNetwork" type="Node2D" parent="."]
+script = ExtResource("res_PathNetwork")
+
+[node name="GridOverlay" type="Node2D" parent="."]
+script = ExtResource("res_GridOverlay")
+
+[node name="SpawnGateA" type="Node2D" parent="."]
+script = ExtResource("res_SpawnGate")
+
+[node name="SpawnGateB" type="Node2D" parent="."]
+script = ExtResource("res_SpawnGate")
+
+[node name="BaseCore" type="Node2D" parent="."]
+script = ExtResource("res_BaseCore")
+
+[node name="HUD" parent="." instance=ExtResource("res_HUD")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("res_PauseMenu")]

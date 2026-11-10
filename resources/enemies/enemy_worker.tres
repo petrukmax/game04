@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyData.gd" id="1_enemy"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = "worker"
+display_name = "Regolith Worker"
+role = "Swarm"
+description = "Slow, cheap and endless. Splash damage clears them efficiently."
+max_health = 72
+speed = 62
+armor = 2
+bounty = 7
+leak_damage = 1
+spawn_weight = 1.0
+flying = false
+burrowed = false
+shield = 0
+shield_regen = 0
+shield_delay = 5.0
+heal_radius = 0
+heal_amount = 0
+heal_interval = 2.0
+ranged_range = 0
+ranged_interval = 4.0
+is_elite = false
+is_boss = false
+scene_path = "res://scenes/enemies/EnemyWorker.tscn"
+visual_style = "worker"
+body_color = Color(0.55, 0.27, 0.18, 1)
+accent_color = Color(0.92, 0.6, 0.25, 1)
+body_scale = 0.88
+tip = "Slow, cheap and endless. Splash damage clears them efficiently."
+resistances = {"kinetic": 0.8, "explosive": 1.2, "fire": 0.9, "electric": 1.0, "frost": 1.0}
+immune_to = []

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "worker"
+count = 20
+path = 0
+interval = 0.35
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "scout"
+count = 14
+path = 1
+interval = 0.3
+delay = 0.6
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 5
+display_name = "Wave 5"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2")]
+completion_bonus = 75
+boss_wave = false
+preview = "Regolith Worker x20 • Dust Scout x14"

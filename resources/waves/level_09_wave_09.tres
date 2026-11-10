@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "shieldbearer"
+count = 8
+path = 0
+interval = 0.95
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "flyer"
+count = 10
+path = 1
+interval = 0.9
+delay = 0.5
+
+[sub_resource type="Resource" id="Spawn_3"]
+script = ExtResource("2_spawn")
+enemy_id = "healer"
+count = 3
+path = 1
+interval = 1.5
+delay = 3.0
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 9
+display_name = "Wave 9"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2"), SubResource("Spawn_3")]
+completion_bonus = 99
+boss_wave = false
+preview = "Shieldbearer x8 • Rift Flyer x10 • Brood Weaver x3"

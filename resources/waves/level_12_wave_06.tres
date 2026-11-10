@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "shieldbearer"
+count = 10
+path = 0
+interval = 0.9
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "burrower"
+count = 12
+path = 1
+interval = 0.8
+delay = 0.5
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 6
+display_name = "Wave 6"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2")]
+completion_bonus = 96
+boss_wave = false
+preview = "Shieldbearer x10 • Burrower x12"

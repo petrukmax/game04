@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyData.gd" id="1_enemy"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = "boss"
+display_name = "Brood Tyrant"
+role = "Boss"
+description = "The Brood Tyrant. Three phases, summons, a shield surge and a final enrage."
+max_health = 4200
+speed = 42
+armor = 18
+bounty = 400
+leak_damage = 10
+spawn_weight = 1.0
+flying = false
+burrowed = false
+shield = 0
+shield_regen = 0
+shield_delay = 5.0
+heal_radius = 0
+heal_amount = 0
+heal_interval = 2.0
+ranged_range = 0
+ranged_interval = 4.0
+is_elite = false
+is_boss = true
+scene_path = "res://scenes/enemies/EnemyBoss.tscn"
+visual_style = "boss"
+body_color = Color(0.22, 0.12, 0.16, 1)
+accent_color = Color(1.0, 0.15, 0.1, 1)
+body_scale = 2.2
+tip = "The Brood Tyrant. Three phases, summons, a shield surge and a final enrage."
+resistances = {"kinetic": 0.65, "explosive": 1.1, "fire": 0.85, "electric": 1.0, "frost": 0.7, "energy": 1.2}
+immune_to = []

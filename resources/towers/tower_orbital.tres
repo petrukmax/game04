@@ -1,0 +1,75 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 390
+display_name = "Focused Lens"
+description = "Tighter beam, far more damage."
+damage_add = 75
+splash_add = 15
+rate_add = 0.03
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 540
+display_name = "Reactor Tap"
+description = "Direct reactor feed accelerates the charge cycle."
+damage_add = 110
+splash_add = 20
+rate_add = 0.04
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 760
+display_name = "Godspear Protocol"
+description = "The full lance of the orbiting platform."
+damage_add = 180
+splash_add = 30
+rate_add = 0.05
+special_note = "Devastating area strike."
+
+[resource]
+script = ExtResource("1_tower")
+id = "orbital"
+display_name = "Orbital Lance"
+role = "Late-game ultimate"
+description = "Charges a delayed orbital beam onto the densest enemy cluster."
+cost = 500
+sell_ratio = 0.7
+max_level = 4
+damage_type = "energy"
+damage = 170
+attack_rate = 0.22
+attack_range = 340
+projectile_speed = 0
+splash_radius = 110
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = true
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = ""
+scene_path = "res://scenes/towers/TowerOrbital.tscn"
+visual_style = "orbital"
+primary_color = Color(1.0, 0.45, 0.7, 1)
+shortcut = "0"
+tip = "Charges a delayed orbital beam onto the densest enemy cluster."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/BootController.gd" id="res_BootController"]
+[node name="Boot" type="Node"]
+script = ExtResource("res_BootController")

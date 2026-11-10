@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 140
+display_name = "Fragment Shells"
+description = "Wider blast radius and more shrapnel."
+damage_add = 18
+splash_add = 15
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 220
+display_name = "HEAT Loader"
+description = "High-explosive anti-tank charge burns through plating."
+damage_add = 24
+splash_add = 20
+armor_pen_add = 0.15
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 340
+display_name = "Siege Breaker"
+description = "Massive shells crack even elite carapaces."
+damage_add = 35
+splash_add = 25
+armor_pen_add = 0.1
+special_note = "Extreme splash damage."
+
+[resource]
+script = ExtResource("1_tower")
+id = "siege"
+display_name = "Siege Cannon"
+role = "Heavy splash"
+description = "Slow explosive shells that punish clustered and armoured arachnids."
+cost = 180
+sell_ratio = 0.7
+max_level = 4
+damage_type = "explosive"
+damage = 45
+attack_rate = 0.55
+attack_range = 215
+projectile_speed = 520
+splash_radius = 65
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0.15
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = false
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = "res://scenes/towers/Projectile.tscn"
+scene_path = "res://scenes/towers/TowerSiege.tscn"
+visual_style = "cannon"
+primary_color = Color(0.8, 0.42, 0.18, 1)
+shortcut = "2"
+tip = "Slow explosive shells that punish clustered and armoured arachnids."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

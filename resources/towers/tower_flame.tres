@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 110
+display_name = "Wide Nozzle"
+description = "Longer reach and a hotter burn."
+damage_add = 4
+burn_add = 3
+range_add = 10
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 170
+display_name = "Fuel Agitator"
+description = "Sticky fuel keeps burning after the vent stops."
+damage_add = 6
+burn_add = 5
+range_add = 15
+slow_duration_add = 0.5
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 280
+display_name = "White-Hot Vent"
+description = "Ceramic-lined vent turns the road into a furnace."
+damage_add = 9
+burn_add = 8
+range_add = 20
+special_note = "Burn damage lasts longer."
+
+[resource]
+script = ExtResource("1_tower")
+id = "flame"
+display_name = "Flame Vent"
+role = "Close area denial"
+description = "Short-range ignition vent. Sets every ground enemy in the ring alight."
+cost = 140
+sell_ratio = 0.7
+max_level = 4
+damage_type = "fire"
+damage = 10
+attack_rate = 2.6
+attack_range = 125
+projectile_speed = 0
+splash_radius = 0
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0
+chain_count = 0
+burn_dps = 8
+burn_duration = 2.0
+missiles = 1
+anti_air = false
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = ""
+scene_path = "res://scenes/towers/TowerFlame.tscn"
+visual_style = "flame"
+primary_color = Color(0.95, 0.35, 0.12, 1)
+shortcut = "3"
+tip = "Short-range ignition vent. Sets every ground enemy in the ring alight."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

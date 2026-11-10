@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyData.gd" id="1_enemy"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = "warrior"
+display_name = "Chitin Warrior"
+role = "Standard melee"
+description = "Balanced frontline arachnid with hardened plates."
+max_health = 175
+speed = 76
+armor = 6
+bounty = 14
+leak_damage = 1
+spawn_weight = 1.0
+flying = false
+burrowed = false
+shield = 0
+shield_regen = 0
+shield_delay = 5.0
+heal_radius = 0
+heal_amount = 0
+heal_interval = 2.0
+ranged_range = 0
+ranged_interval = 4.0
+is_elite = false
+is_boss = false
+scene_path = "res://scenes/enemies/EnemyWarrior.tscn"
+visual_style = "warrior"
+body_color = Color(0.66, 0.22, 0.16, 1)
+accent_color = Color(1.0, 0.5, 0.2, 1)
+body_scale = 1.02
+tip = "Balanced frontline arachnid with hardened plates."
+resistances = {"kinetic": 0.75, "explosive": 1.15, "fire": 0.9, "electric": 1.0, "frost": 0.9}
+immune_to = []

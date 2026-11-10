@@ -1,0 +1,75 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 180
+display_name = "Signal Array"
+description = "Wider command aura and a larger stipend."
+buff_add = 0.08
+range_add = 20
+income_add = 10
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 280
+display_name = "Targeting Uplink"
+description = "Nearby towers fire harder and faster."
+buff_add = 0.1
+range_add = 30
+income_add = 15
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 430
+display_name = "Orbital Command"
+description = "Battlefield-wide coordination and rich stipends."
+buff_add = 0.15
+range_add = 40
+income_add = 25
+special_note = "Large aura and income."
+
+[resource]
+script = ExtResource("1_tower")
+id = "relay"
+display_name = "Command Relay"
+role = "Support / economy"
+description = "Buffs nearby towers and pays a credit stipend at the end of each wave."
+cost = 250
+sell_ratio = 0.7
+max_level = 4
+damage_type = "support"
+damage = 0
+attack_rate = 0
+attack_range = 0
+projectile_speed = 0
+splash_radius = 0
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = false
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0
+stun_duration = 0
+support_radius = 170
+support_buff = 0.2
+income_per_wave = 25
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = ""
+scene_path = "res://scenes/towers/TowerRelay.tscn"
+visual_style = "relay"
+primary_color = Color(0.35, 0.9, 0.62, 1)
+shortcut = "8"
+tip = "Buffs nearby towers and pays a credit stipend at the end of each wave."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

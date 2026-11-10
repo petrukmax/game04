@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "elite"
+count = 1
+path = 0
+interval = 1
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "burrower"
+count = 10
+path = 1
+interval = 0.9
+delay = 1.0
+
+[sub_resource type="Resource" id="Spawn_3"]
+script = ExtResource("2_spawn")
+enemy_id = "warrior"
+count = 12
+path = 1
+interval = 0.6
+delay = 4.0
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 9
+display_name = "Final Assault"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2"), SubResource("Spawn_3")]
+completion_bonus = 134
+boss_wave = true
+preview = "Arachnid Elite x1 • Burrower x10 • Chitin Warrior x12"

@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyData.gd" id="1_enemy"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = "scout"
+display_name = "Dust Scout"
+role = "Fast swarm"
+description = "A quick, fragile runner that probes both roads in packs."
+max_health = 48
+speed = 136
+armor = 0
+bounty = 8
+leak_damage = 1
+spawn_weight = 1.0
+flying = false
+burrowed = false
+shield = 0
+shield_regen = 0
+shield_delay = 5.0
+heal_radius = 0
+heal_amount = 0
+heal_interval = 2.0
+ranged_range = 0
+ranged_interval = 4.0
+is_elite = false
+is_boss = false
+scene_path = "res://scenes/enemies/EnemyScout.tscn"
+visual_style = "scout"
+body_color = Color(0.78, 0.34, 0.16, 1)
+accent_color = Color(1.0, 0.72, 0.28, 1)
+body_scale = 0.72
+tip = "A quick, fragile runner that probes both roads in packs."
+resistances = {"kinetic": 1.0, "explosive": 0.8, "fire": 1.0, "electric": 1.1, "frost": 0.75}
+immune_to = []

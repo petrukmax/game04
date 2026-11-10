@@ -1,0 +1,72 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 140
+display_name = "Larger Payload"
+description = "Mines hit harder and deploy quicker."
+mine_damage_add = 30
+deploy_interval_add = -0.4
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 210
+display_name = "Rapid Dispenser"
+description = "A motorised hatch lays traps continuously."
+mine_damage_add = 45
+deploy_interval_add = -0.5
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 320
+display_name = "Cluster Mines"
+description = "Each mine seeds a lethal fragmentation ring."
+mine_damage_add = 70
+deploy_interval_add = -0.6
+special_note = "Very fast deployment."
+
+[resource]
+script = ExtResource("1_tower")
+id = "mine"
+display_name = "Mine Layer"
+role = "Trap defence"
+description = "Scatters proximity mines on nearby road cells. Excellent at chokepoints."
+cost = 180
+sell_ratio = 0.7
+max_level = 4
+damage_type = "explosive"
+damage = 0
+attack_rate = 0
+attack_range = 180
+projectile_speed = 0
+splash_radius = 0
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = false
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 4.5
+mine_damage = 80
+projectile_scene_path = ""
+scene_path = "res://scenes/towers/TowerMine.tscn"
+visual_style = "mine"
+primary_color = Color(0.9, 0.55, 0.18, 1)
+shortcut = "9"
+tip = "Scatters proximity mines on nearby road cells. Excellent at chokepoints."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

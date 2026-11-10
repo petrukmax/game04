@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/Tower.gd" id="res_Tower"]
+[ext_resource type="Resource" path="res://resources/towers/tower_tesla.tres" id="res_tower_tesla"]
+[ext_resource type="Script" path="res://scripts/towers/TowerVisual.gd" id="res_TowerVisual"]
+[ext_resource type="Script" path="res://scripts/towers/TowerRangeIndicator.gd" id="res_TowerRangeIndicator"]
+[node name="TowerTesla" type="Node2D"]
+script = ExtResource("res_Tower")
+tower_data = ExtResource("res_tower_tesla")
+
+[node name="RangeIndicator" type="Node2D" parent="."]
+z_index = -1
+script = ExtResource("res_TowerRangeIndicator")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("res_TowerVisual")
+
+[node name="Muzzle" type="Marker2D" parent="."]
+position = Vector2(22, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

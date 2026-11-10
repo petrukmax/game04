@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "elite"
+count = 1
+path = 0
+interval = 1
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "elite"
+count = 1
+path = 1
+interval = 1
+delay = 2.0
+
+[sub_resource type="Resource" id="Spawn_3"]
+script = ExtResource("2_spawn")
+enemy_id = "shieldbearer"
+count = 14
+path = 1
+interval = 0.8
+delay = 4.0
+
+[sub_resource type="Resource" id="Spawn_4"]
+script = ExtResource("2_spawn")
+enemy_id = "flyer"
+count = 20
+path = 1
+interval = 0.68
+delay = 8.0
+
+[sub_resource type="Resource" id="Spawn_5"]
+script = ExtResource("2_spawn")
+enemy_id = "warrior"
+count = 20
+path = 0
+interval = 0.42
+delay = 10.0
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 12
+display_name = "Final Assault"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2"), SubResource("Spawn_3"), SubResource("Spawn_4"), SubResource("Spawn_5")]
+completion_bonus = 167
+boss_wave = true
+preview = "Arachnid Elite x2 • Shieldbearer x14 • Rift Flyer x20 • Chitin Warrior x20"

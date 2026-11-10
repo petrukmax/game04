@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "boss"
+count = 1
+path = 0
+interval = 1
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "elite"
+count = 1
+path = 1
+interval = 1
+delay = 3.0
+
+[sub_resource type="Resource" id="Spawn_3"]
+script = ExtResource("2_spawn")
+enemy_id = "shieldbearer"
+count = 16
+path = 1
+interval = 0.75
+delay = 5.0
+
+[sub_resource type="Resource" id="Spawn_4"]
+script = ExtResource("2_spawn")
+enemy_id = "flyer"
+count = 24
+path = 1
+interval = 0.62
+delay = 10.0
+
+[sub_resource type="Resource" id="Spawn_5"]
+script = ExtResource("2_spawn")
+enemy_id = "healer"
+count = 6
+path = 1
+interval = 1.1
+delay = 14.0
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 14
+display_name = "Final Assault"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2"), SubResource("Spawn_3"), SubResource("Spawn_4"), SubResource("Spawn_5")]
+completion_bonus = 179
+boss_wave = true
+preview = "Brood Tyrant x1 • Arachnid Elite x1 • Shieldbearer x16 • Rift Flyer x24 • Brood Weaver x6"

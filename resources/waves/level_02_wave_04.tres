@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://scripts/core/SpawnEntry.gd" id="2_spawn"]
+
+[sub_resource type="Resource" id="Spawn_1"]
+script = ExtResource("2_spawn")
+enemy_id = "spitter"
+count = 2
+path = 0
+interval = 2.0
+delay = 0
+
+[sub_resource type="Resource" id="Spawn_2"]
+script = ExtResource("2_spawn")
+enemy_id = "warrior"
+count = 5
+path = 1
+interval = 0.9
+delay = 0.5
+
+[sub_resource type="Resource" id="Spawn_3"]
+script = ExtResource("2_spawn")
+enemy_id = "scout"
+count = 8
+path = 1
+interval = 0.4
+delay = 2.0
+
+[resource]
+script = ExtResource("1_wave")
+wave_index = 4
+display_name = "Wave 4"
+entries = [SubResource("Spawn_1"), SubResource("Spawn_2"), SubResource("Spawn_3")]
+completion_bonus = 69
+boss_wave = false
+preview = "Acid Spitter x2 • Chitin Warrior x5 • Dust Scout x8"

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/AbilityData.gd" id="1_ability"]
+
+[resource]
+script = ExtResource("1_ability")
+id = "emp"
+display_name = "EMP Pulse"
+description = "Stuns and slows every arachnid in the zone, and overloads energy shields."
+cooldown = 34
+uses_per_level = -1
+target_mode = "area"
+radius = 155
+delay = 0.0
+damage = 35
+damage_type = "electric"
+duration = 3.0
+stun_duration = 2.5
+slow_amount = 0.5
+credits = 0
+heal_amount = 0
+shortcut = "W"
+color = Color(0.35, 0.75, 1.0, 1)

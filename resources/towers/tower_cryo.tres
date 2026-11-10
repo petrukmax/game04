@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 150
+display_name = "Cryo Mix"
+description = "Colder burst and a larger freezing cloud."
+damage_add = 5
+slow_add = 0.08
+splash_add = 10
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 230
+display_name = "Deep Freeze"
+description = "The chill clings to carapace much longer."
+damage_add = 8
+slow_add = 0.1
+slow_duration_add = 0.7
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 330
+display_name = "Absolute Zero"
+description = "A wide field of near-solid air."
+damage_add = 14
+slow_add = 0.12
+range_add = 25
+splash_add = 15
+special_note = "Powerful area slow."
+
+[resource]
+script = ExtResource("1_tower")
+id = "cryo"
+display_name = "Cryo Emitter"
+role = "Crowd control"
+description = "Cryogenic shells chill an area, slowing ground and flying enemies."
+cost = 200
+sell_ratio = 0.7
+max_level = 4
+damage_type = "frost"
+damage = 9
+attack_rate = 1.0
+attack_range = 205
+projectile_speed = 560
+splash_radius = 50
+slow_amount = 0.4
+slow_duration = 2.0
+armor_penetration = 0
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = true
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = "res://scenes/towers/Projectile.tscn"
+scene_path = "res://scenes/towers/TowerCryo.tscn"
+visual_style = "cryo"
+primary_color = Color(0.5, 0.82, 0.95, 1)
+shortcut = "6"
+tip = "Cryogenic shells chill an area, slowing ground and flying enemies."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

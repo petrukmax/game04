@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/fx/DamageNumber.gd" id="res_DamageNumber"]
+[node name="DamageNumber" type="Label"]
+script = ExtResource("res_DamageNumber")

@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/fx/OrbitalStrike.gd" id="res_OrbitalStrike"]
+[node name="OrbitalStrike" type="Node2D"]
+script = ExtResource("res_OrbitalStrike")

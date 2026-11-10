@@ -1,0 +1,75 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/TowerData.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/UpgradeData.gd" id="2_upgrade"]
+
+[sub_resource type="Resource" id="Upgrade_1"]
+script = ExtResource("2_upgrade")
+level = 2
+cost = 180
+display_name = "Twin Rack"
+description = "Adds a second missile to every salvo."
+damage_add = 14
+splash_add = 10
+missiles_add = 1
+
+[sub_resource type="Resource" id="Upgrade_2"]
+script = ExtResource("2_upgrade")
+level = 3
+cost = 270
+display_name = "Guidance Suite"
+description = "Better tracking and a faster reload."
+damage_add = 20
+splash_add = 15
+rate_add = 0.15
+
+[sub_resource type="Resource" id="Upgrade_3"]
+script = ExtResource("2_upgrade")
+level = 4
+cost = 410
+display_name = "Saturation Rack"
+description = "Three missiles per salvo saturate the road."
+damage_add = 32
+splash_add = 20
+missiles_add = 1
+special_note = "Three missiles per salvo."
+
+[resource]
+script = ExtResource("1_tower")
+id = "missile"
+display_name = "Missile Battery"
+role = "Anti-swarm / anti-air"
+description = "Homing missile cells. The dedicated answer to flyers and tight groups."
+cost = 260
+sell_ratio = 0.7
+max_level = 4
+damage_type = "explosive"
+damage = 34
+attack_rate = 0.75
+attack_range = 275
+projectile_speed = 520
+splash_radius = 55
+slow_amount = 0
+slow_duration = 0
+armor_penetration = 0
+chain_count = 0
+burn_dps = 0
+burn_duration = 0
+missiles = 1
+anti_air = true
+can_target_ground = true
+crit_chance = 0
+stun_chance = 0
+stun_duration = 0
+support_radius = 0
+support_buff = 0
+income_per_wave = 0
+deploy_interval = 0
+mine_damage = 0
+projectile_scene_path = "res://scenes/towers/Projectile.tscn"
+scene_path = "res://scenes/towers/TowerMissile.tscn"
+visual_style = "missile"
+primary_color = Color(0.92, 0.72, 0.3, 1)
+shortcut = "5"
+tip = "Homing missile cells. The dedicated answer to flyers and tight groups."
+upgrades = [SubResource("Upgrade_1"), SubResource("Upgrade_2"), SubResource("Upgrade_3")]

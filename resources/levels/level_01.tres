@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/LevelData.gd" id="1_level"]
+[ext_resource type="Resource" path="res://resources/waves/level_01_wave_01.tres" id="w1"]
+[ext_resource type="Resource" path="res://resources/waves/level_01_wave_02.tres" id="w2"]
+[ext_resource type="Resource" path="res://resources/waves/level_01_wave_03.tres" id="w3"]
+[ext_resource type="Resource" path="res://resources/waves/level_01_wave_04.tres" id="w4"]
+[ext_resource type="Resource" path="res://resources/waves/level_01_wave_05.tres" id="w5"]
+[ext_resource type="Resource" path="res://resources/waves/level_01_wave_06.tres" id="w6"]
+
+[resource]
+script = ExtResource("1_level")
+id = "landing_zone"
+display_name = "Landing Zone"
+level_number = 1
+difficulty = "Easy"
+description = "The first outpost. Learn placement, upgrades and wave timing."
+starting_credits = 620
+base_health = 100
+completion_reward = 120
+interest_rate = 0.0
+grid_width = 22
+grid_height = 11
+build_margin = 2
+path_a = [Vector2(0, 2), Vector2(14, 2), Vector2(14, 7), Vector2(21, 7)]
+path_b = [Vector2(0, 7), Vector2(6, 7), Vector2(6, 5), Vector2(21, 5)]
+blocked_cells = [Vector2i(0, 0), Vector2i(1, 10), Vector2i(2, 0), Vector2i(2, 1), Vector2i(3, 9), Vector2i(4, 8), Vector2i(6, 9), Vector2i(10, 3), Vector2i(15, 3), Vector2i(15, 8), Vector2i(15, 9), Vector2i(16, 3), Vector2i(17, 2), Vector2i(17, 4), Vector2i(19, 0), Vector2i(19, 10), Vector2i(20, 10), Vector2i(21, 0), Vector2i(21, 10)]
+available_towers = ["pulse", "siege", "flame", "relay", "mine"]
+unlocked_abilities = ["orbital_strike", "emergency_repair"]
+wave_data_list = [ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4"), ExtResource("w5"), ExtResource("w6")]
+environment_theme = "landing"
+ground_color = Color(0.46, 0.2, 0.13, 1)
+dust_color = Color(0.9, 0.52, 0.3, 1)
+prop_seed = 11
+briefing = "The first outpost. Learn placement, upgrades and wave timing."

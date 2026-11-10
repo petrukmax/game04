@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/LevelData.gd" id="1_level"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_01.tres" id="w1"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_02.tres" id="w2"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_03.tres" id="w3"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_04.tres" id="w4"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_05.tres" id="w5"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_06.tres" id="w6"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_07.tres" id="w7"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_08.tres" id="w8"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_09.tres" id="w9"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_10.tres" id="w10"]
+[ext_resource type="Resource" path="res://resources/waves/level_12_wave_11.tres" id="w11"]
+
+[resource]
+script = ExtResource("1_level")
+id = "stormline"
+display_name = "Stormline"
+level_number = 12
+difficulty = "Very Hard"
+description = "Static storms feed the arachnids. Fast waves, slows and chokepoint defence."
+starting_credits = 780
+base_health = 80
+completion_reward = 270
+interest_rate = 0.0
+grid_width = 22
+grid_height = 11
+build_margin = 2
+path_a = [Vector2(0, 3), Vector2(5, 3), Vector2(5, 8), Vector2(11, 8), Vector2(11, 3), Vector2(17, 3), Vector2(17, 8), Vector2(21, 8)]
+path_b = [Vector2(0, 6), Vector2(21, 6)]
+blocked_cells = [Vector2i(0, 0), Vector2i(1, 10), Vector2i(2, 0), Vector2i(4, 1), Vector2i(4, 8), Vector2i(5, 1), Vector2i(6, 1), Vector2i(6, 5), Vector2i(6, 7), Vector2i(7, 2), Vector2i(10, 2), Vector2i(12, 2), Vector2i(12, 7), Vector2i(13, 2), Vector2i(14, 1), Vector2i(14, 4), Vector2i(15, 9), Vector2i(16, 4), Vector2i(16, 7), Vector2i(17, 2), Vector2i(18, 1), Vector2i(18, 7), Vector2i(19, 0), Vector2i(19, 1), Vector2i(19, 3), Vector2i(19, 7), Vector2i(19, 10), Vector2i(20, 10), Vector2i(21, 0), Vector2i(21, 10)]
+available_towers = ["pulse", "siege", "flame", "tesla", "missile", "cryo", "rail", "relay", "mine", "orbital"]
+unlocked_abilities = ["orbital_strike", "emp", "reinforcement_drones", "emergency_repair", "supply_drop"]
+wave_data_list = [ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4"), ExtResource("w5"), ExtResource("w6"), ExtResource("w7"), ExtResource("w8"), ExtResource("w9"), ExtResource("w10"), ExtResource("w11")]
+environment_theme = "storm"
+ground_color = Color(0.32, 0.2, 0.22, 1)
+dust_color = Color(0.65, 0.48, 0.58, 1)
+prop_seed = 132
+briefing = "Static storms feed the arachnids. Fast waves, slows and chokepoint defence."
