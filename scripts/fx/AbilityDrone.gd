@@ -53,7 +53,7 @@ func _physics_process(delta: float) -> void:
 func _find_target() -> Node:
 	var best: Node = null
 	var best_distance := patrol_radius * patrol_radius
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy in TargetingSystem.enemies(get_tree()):
 		if enemy == null or not is_instance_valid(enemy) or not enemy.is_targetable():
 			continue
 		var d: float = center.distance_squared_to(enemy.global_position)

@@ -15,7 +15,7 @@ was actually run or measured; nothing below claims a human playtest that did not
 | Area | Verdict | Evidence |
 | --- | --- | --- |
 | Campaign (15 sectors) | Working | `FairPlayTest`: 15/15 victories on the normal economy; `PlaythroughTest`: 15/15 |
-| Mechanics | Working | `TestRunner`: 661 checks, 0 failures |
+| Mechanics | Working | `TestRunner`: 663 checks, 0 failures |
 | UI and flows | Working | `FlowTest`: 35 checks, 0 failures; rendered captures at 1600×900 and 1280×720 |
 | Restart/pause lifecycle | Working | `RestartTest`: real scene reload, OK |
 | Save/load | Working | `FlowTest` persistence checks; browser reload kept the changed volume |
@@ -61,7 +61,7 @@ All commands were run from the repository root with the local Godot 4.7.2 consol
 
 ```text
 godot --headless --path . --fixed-fps 60 res://tests/TestRunner.tscn
-  RESULT: 661 checks, 0 failures
+  RESULT: 663 checks, 0 failures
 
 godot --headless --path . --fixed-fps 60 res://tests/FlowTest.tscn
   RESULT: 35 checks, 0 failures (settings, mute, pause, victory/defeat wiring)

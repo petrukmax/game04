@@ -193,6 +193,8 @@ tests/
   FlowTest.tscn            Settings persistence, mute, pause, victory/defeat wiring
   RestartTest.tscn         Real scene-reload restart check
   ScreenshotTest.tscn      Rendered UI captures
+  PerfTest.tscn            Dense late-campaign timing benchmark (Sector 15)
+  StressTest.tscn          Crowd benchmark: N live enemies, optional --no-* flags
 tools/
   build_data.py            Regenerates tower/enemy/ability/level/wave .tres files
   build_scenes.py          Regenerates the repetitive scene files
@@ -265,6 +267,19 @@ Rendered UI captures (requires a display/GPU, do not pass `--headless`):
 ```bash
 godot --path . res://tests/ScreenshotTest.tscn
 ```
+
+Performance benchmarks (headless = simulation cost; windowed = real render cost):
+
+```bash
+godot --headless --path . --fixed-fps 60 res://tests/PerfTest.tscn
+godot --path . --fixed-fps 60 res://tests/StressTest.tscn -- --enemies=140 --frames=240
+godot --headless --path . --fixed-fps 60 res://tests/StressTest.tscn -- --enemies=140 --frames=240
+```
+
+`StressTest` accepts `--enemies=`, `--frames=`, `--speed=` plus isolation flags
+`--no-tower-ai`, `--no-enemy-ai`, `--no-visuals`, `--no-map`, `--no-hud`,
+`--no-towers`, `--no-bars`, `--no-body`, `--no-legs`, `--no-visual-process`
+for attributing frame cost.
 
 Browser smoke test (Node 20+, Chrome/Edge installed):
 

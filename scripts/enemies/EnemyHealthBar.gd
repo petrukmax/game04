@@ -3,6 +3,7 @@ extends Node2D
 
 var data: EnemyData
 var _bar_width: float = 42.0
+var _last_signature: int = -1
 
 
 func configure(enemy_data: EnemyData) -> void:
@@ -13,10 +14,35 @@ func configure(enemy_data: EnemyData) -> void:
 		_bar_width = 64.0
 	else:
 		_bar_width = 42.0
+	_last_signature = -1
 	queue_redraw()
 
 
 func _process(_delta: float) -> void:
+	var enemy = get_parent()
+	if enemy == null or enemy.dead or enemy.removed:
+		return
+	# The bar is a pure function of health, shield and active statuses. Rebuild
+	# it only when one of those visibly changes instead of every single frame.
+	var health_key := int(clampf(enemy.health / maxf(1.0, enemy.max_health), 0.0, 1.0) * 127.0)
+	var shield_key := 0
+	if enemy.max_shield > 0.0:
+		shield_key = int(clampf(enemy.shield_current / maxf(1.0, enemy.max_shield), 0.0, 1.0) * 63.0)
+	var status_mask := 0
+	if enemy.burn_timer > 0.0:
+		status_mask |= 1
+	if enemy.slow_timer > 0.0:
+		status_mask |= 2
+	if enemy.stun_timer > 0.0:
+		status_mask |= 4
+	if enemy.corrode_timer > 0.0:
+		status_mask |= 8
+	if enemy.burrow_active:
+		status_mask |= 16
+	var signature := health_key + 128 * shield_key + 8192 * status_mask
+	if signature == _last_signature:
+		return
+	_last_signature = signature
 	queue_redraw()
 
 

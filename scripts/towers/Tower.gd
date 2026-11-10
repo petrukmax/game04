@@ -22,6 +22,14 @@ var _muzzle: Marker2D
 var _animation_player: AnimationPlayer
 var _audio_player: AudioStreamPlayer
 
+## Support auras change only when a relay is built, upgraded or sold. Rescan
+## them a few times per second instead of on every shot from every tower.
+var _support_cache: Dictionary = {"damage": 0.0, "rate": 0.0}
+var _support_timer: float = 0.0
+
+## Packed projectile scenes are shared by all towers of the same type.
+static var _projectile_scene_cache: Dictionary = {}
+
 
 func _ready() -> void:
 	add_to_group("towers")
@@ -62,6 +70,10 @@ func _physics_process(delta: float) -> void:
 		return
 	var step: float = delta * float(level.game_speed)
 	step = minf(step, GameConfig.MAX_DELTA * 3.0)
+	_support_timer -= step
+	if _support_timer <= 0.0:
+		_support_timer = 0.25
+		_support_cache = _scan_support_bonus()
 	if _animation_player and _animation_player.is_playing():
 		pass
 	if disabled_timer > 0.0:
@@ -100,19 +112,23 @@ func _attack() -> void:
 
 
 func _effective_stats() -> Dictionary:
-	var buff := get_support_bonus()
-	var out := stats.duplicate(true)
+	var buff := _support_cache
+	var out := stats.duplicate()
 	out["damage"] = float(stats.damage) * (1.0 + float(buff.damage))
 	out["attack_rate"] = float(stats.attack_rate) * (1.0 + float(buff.rate))
 	return out
 
 
 func get_support_bonus() -> Dictionary:
+	return _scan_support_bonus()
+
+
+func _scan_support_bonus() -> Dictionary:
 	var damage := 0.0
 	var rate := 0.0
 	if level == null:
 		return {"damage": 0.0, "rate": 0.0}
-	for other in get_tree().get_nodes_in_group("towers"):
+	for other in TargetingSystem.towers(get_tree()):
 		if other == self or not is_instance_valid(other):
 			continue
 		if other.tower_data == null or other.tower_data.id != "relay":
@@ -141,14 +157,17 @@ func _attack_projectile() -> void:
 
 func _fire_projectile(target: Node, damage: float, crit: bool) -> void:
 	var path := tower_data.projectile_scene_path
-	if path == "" or not ResourceLoader.exists(path):
+	var scene: PackedScene = _projectile_scene_cache.get(path)
+	if path == "" or (scene == null and not ResourceLoader.exists(path)):
 		DamageSystem.hit(target, damage, tower_data.damage_type,
 			float(stats.armor_penetration), self)
 		_spawn_hit_fx(target.global_position, tower_data.damage_type)
 		return
+	if scene == null:
+		scene = load(path)
+		_projectile_scene_cache[path] = scene
 	var missiles := maxi(1, int(stats.missiles))
 	for i in missiles:
-		var scene: PackedScene = load(path)
 		var projectile := scene.instantiate()
 		level.add_projectile(projectile)
 		var aim_target := target
@@ -184,7 +203,7 @@ func _fire_projectile(target: Node, damage: float, crit: bool) -> void:
 func _nearest_other_target(exclude: Node, start_index: int) -> Node:
 	var best: Node = null
 	var best_distance := 1.0e20
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy in TargetingSystem.enemies(get_tree()):
 		if enemy == exclude or not is_instance_valid(enemy):
 			continue
 		if not enemy.is_targetable():
@@ -252,7 +271,7 @@ func _attack_tesla() -> void:
 func _next_chain_target(from: Node, already_hit: Array) -> Node:
 	var best: Node = null
 	var best_distance := 115.0 * 115.0
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy in TargetingSystem.enemies(get_tree()):
 		if enemy == from or already_hit.has(enemy) or not is_instance_valid(enemy):
 			continue
 		if not enemy.is_targetable():
@@ -300,17 +319,18 @@ func _densest_cluster(attack_range: float) -> Node:
 	var best: Node = null
 	var best_score := -1
 	var candidates: Array = []
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy in TargetingSystem.enemies(get_tree()):
 		if not is_instance_valid(enemy) or not enemy.is_targetable():
 			continue
 		if enemy.flying and not GameConfig.as_bool(stats.get("anti_air", false)):
 			continue
-		if global_position.distance_to(enemy.global_position) <= attack_range:
+		if global_position.distance_squared_to(enemy.global_position) <= attack_range * attack_range:
 			candidates.append(enemy)
 	for candidate in candidates:
 		var score := 0
+		var splash_sq := float(stats.splash_radius) * float(stats.splash_radius)
 		for other in candidates:
-			if candidate.global_position.distance_to(other.global_position) <= float(stats.splash_radius):
+			if candidate.global_position.distance_squared_to(other.global_position) <= splash_sq:
 				score += 1
 		if score > best_score:
 			best_score = score

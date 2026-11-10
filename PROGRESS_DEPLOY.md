@@ -14,7 +14,7 @@ different project.
 - **Status:** complete — the desktop project is unchanged, and the browser build is published
   through a themed `index.html` launcher with the game in `web/`.
 - **Engine:** Godot 4.7.2 stable (`%LOCALAPPDATA%\Temp\opencode\godot`), GL Compatibility.
-- **Desktop evidence:** `TestRunner` 661 checks / 0 failures; `FlowTest` 35 / 0; `RestartTest`
+- **Desktop evidence:** `TestRunner` 663 checks / 0 failures; `FlowTest` 35 / 0; `RestartTest`
   OK; `FairPlayTest` 15/15 victories; `PlaythroughTest` 15/15.
 - **Web export:** single-threaded template, release build, `web/index.wasm` 39,514,754 bytes,
   `web/index.pck` 841,472 bytes, `web/` total 38.82 MB.
@@ -32,7 +32,7 @@ different project.
 - [x] Read `Defender.md`, `PROGRESS.md` (format reference) and `PROGRESS_MARS.md`.
 - [x] Confirm the working folder is the active project, not `Defender0.1`.
 - [x] Verify Godot 4.7.2 boots `res://scenes/main/Boot.tscn` to the main menu.
-- [x] Run `tests/TestRunner.tscn` headlessly: 661 checks, 0 failures.
+- [x] Run `tests/TestRunner.tscn` headlessly: 663 checks, 0 failures.
 - [x] Re-read the existing verification logs (`fairplay.log`, `playthrough.log`, `flow_test.log`,
   `restart_test.log`, `perf_test.log`).
 - [x] Identify the real gaps: `FEATURE_AUDIT.md` referenced but absent; no `index.html`; no Web
@@ -93,7 +93,7 @@ different project.
 - [x] Update `README.md`: browser play, deployment, new files, web smoke test, limitations.
 
 ## Block D6 — Final regression [x]
-- [x] Re-run `TestRunner` after all file additions: 661 checks, 0 failures (also re-run
+- [x] Re-run `TestRunner` after all file additions: 663 checks, 0 failures (also re-run
   after the web-only `MainMenuController.gd` edit).
 - [x] Re-export the Web build after the launcher changes.
 - [x] Verify the export below a sub-path (`/Defender/`) to match `user.github.io/repo/`.

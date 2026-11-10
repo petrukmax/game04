@@ -8,6 +8,13 @@ var kick_timer: float = 0.0
 var selected: bool = false
 var disabled: bool = false
 var _time: float = 0.0
+var _anim_accum: float = 0.0
+
+## Only styles whose art actually changes over time need a continuous redraw.
+const ANIM_INTERVAL := 1.0 / 24.0
+const ANIMATED_STYLES := {
+	"tesla": true, "cryo": true, "relay": true, "mine": true, "orbital": true,
+}
 
 
 func configure(tower_data: TowerData) -> void:
@@ -43,9 +50,16 @@ func on_upgrade() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	var was_kicking := kick_timer > 0.0
 	if kick_timer > 0.0:
 		kick_timer = maxf(0.0, kick_timer - delta)
-	queue_redraw()
+	if disabled or ANIMATED_STYLES.has(style):
+		_anim_accum += delta
+		if _anim_accum >= ANIM_INTERVAL:
+			_anim_accum = 0.0
+			queue_redraw()
+	elif kick_timer > 0.0 or was_kicking:
+		queue_redraw()
 
 
 func _draw() -> void:

@@ -12,7 +12,7 @@ This file is the project's own progress tracker; the supplied `PROGRESS.md` is o
 - **Entry point:** `res://scenes/main/Boot.tscn` -> `MainMenu.tscn` -> level scenes.
 - **Scope:** 15 levels, 10 towers (3 upgrades each), 10 enemy types, 5 abilities, full campaign UI, original procedural art/audio.
 - **Content counts:** 71 scenes, 59 scripts, 184 `.tres` resources (15 levels, 10 towers, 10 enemies, 5 abilities, wave sets), 37 generated WAV files.
-- **Verification:** `tests/TestRunner.tscn` 660 checks / 0 failures; `tests/FlowTest.tscn` 35 checks / 0 failures; `tests/RestartTest.tscn` OK; `tests/PlaythroughTest.tscn` 15/15 victories; `tests/FairPlayTest.tscn` 15/15 victories on the normal economy.
+- **Verification:** `tests/TestRunner.tscn` 663 checks / 0 failures; `tests/FlowTest.tscn` 35 checks / 0 failures; `tests/RestartTest.tscn` OK; `tests/PlaythroughTest.tscn` 15/15 victories; `tests/FairPlayTest.tscn` 15/15 victories on the normal economy; `tests/PerfTest.tscn` and `tests/StressTest.tscn` report late-wave frame times (see Block 11).
 - **Rendered evidence:** `tests/screenshots_1600x900/` (11 screens at 1600x900 and 1280x720-scaled window captures).
 - **Known exit-time limitation:** headless runs may print ObjectDB/resource "still in use" warnings after `quit()`; gameplay and all assertions complete normally. Documented in `FEATURE_AUDIT.md`.
 
@@ -94,3 +94,46 @@ This file is the project's own progress tracker; the supplied `PROGRESS.md` is o
 - [x] `FEATURE_AUDIT.md` full table with Working/Partial/Missing/Broken and evidence.
 - [x] Final project tree, no external runtime dependencies, no oversized monoliths.
 - [x] Final check: main scene, autoloads, 15 levels, 10 towers, 10 enemies, docs.
+
+## Block 11 — Late-wave performance [x]
+Goal: keep late waves smooth (Sector 15 waves 12–14 peak near 50 live enemies; the
+stress harness deliberately uses 140 as a ~3× worst case).
+- [x] `tests/StressTest.gd/.tscn`: spawns N high-health enemies, builds 17 maxed towers,
+      reports avg/p50/p95/p99 wall time, engine monitors, draw calls and optional
+      per-enemy profiler. Isolation flags: `--no-tower-ai`, `--no-enemy-ai`,
+      `--no-visuals`, `--no-map`, `--no-hud`, `--no-towers`, `--no-bars`, `--no-body`,
+      `--no-legs`.
+- [x] `PathManager`: precomputed cumulative lengths + binary-search `point_at_distance`
+      (enemies called it twice per frame).
+- [x] `TargetingSystem`: per-physics-frame enemy/tower group caches, squared-distance
+      range checks, shared by towers, enemies, mines and drones.
+- [x] `EnemyVisual`: body styles baked into one shared atlas (normal + hit-flash
+      variant), so a body is one textured quad; legs moved to a single batched
+      `EnemyLegsLayer` (≈18 draw commands for the whole swarm, antialiasing off).
+- [x] `EnemyHealthBar`: redrawn only when quantized health/shield/status changes.
+- [x] `TowerVisual`: 24 Hz redraw only for animated styles (tesla, cryo, relay, mine,
+      orbital) or disabled/kick states.
+- [x] `Tower`: cached support aura (0.25 s rescan), static projectile-scene cache,
+      shallow stat copy, squared distances.
+- [x] `Enemy`: aggregated damage numbers per enemy (0.2 s flush + flush on death),
+      cached healer/spitter scans.
+- [x] `LevelBase`: all FX/beam/damage/mine/orbital/drone/projectile scenes preloaded;
+      `MAX_LIVE_EFFECTS = 90`, `MAX_DAMAGE_LABELS = 32`; low-priority FX skipped under
+      load; terrain + roads and the build grid baked once into two textures
+      (~1100 static draw commands → 2).
+- [x] `Projectile`: missile trail drawn from a local polyline instead of spawning a
+      `MissileTrail` FX node every 35 ms.
+
+Measured results (NVIDIA GTX 1050 Ti, OpenGL compatibility, vsync off):
+
+| Scenario | Before | After |
+| --- | --- | --- |
+| Stress 140 enemies, windowed p50 | 66.48 ms | 27.9–30.5 ms |
+| Stress 140 enemies, windowed draw calls | 4248 | ≈1490 |
+| Stress 140 enemies, headless p50 | 50.32 ms | ≈12.3 ms |
+| Stress 50 enemies, windowed p50 | — | ≈18–20 ms |
+| PerfTest (real campaign, Sector 15) avg | 10.43 ms | 4.71 ms |
+
+- [x] Regression suites: `TestRunner` 663/0, `FlowTest` 35/0, `FairPlayTest` 15/15,
+      `RestartTest` OK, `PerfTest` 14/14 waves.
+- [x] Web export rebuilt (`web/`), `node tools/check-pages.mjs` — Pages readiness PASS.

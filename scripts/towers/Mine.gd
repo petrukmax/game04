@@ -37,12 +37,12 @@ func _physics_process(delta: float) -> void:
 		_dead = true
 		queue_free()
 		return
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy in TargetingSystem.enemies(get_tree()):
 		if enemy == null or not is_instance_valid(enemy):
 			continue
 		if enemy.dead or enemy.burrow_active or enemy.flying:
 			continue
-		if global_position.distance_to(enemy.global_position) <= 28.0:
+		if global_position.distance_squared_to(enemy.global_position) <= 28.0 * 28.0:
 			_explode()
 			return
 

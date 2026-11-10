@@ -10,6 +10,7 @@ const ABILITY_SHORTCUTS := {
 	"Q": "orbital_strike", "W": "emp", "E": "reinforcement_drones",
 	"R": "emergency_repair", "T": "supply_drop",
 }
+const ENEMY_VISUAL_SCRIPT := preload("res://scripts/enemies/EnemyVisual.gd")
 const FX_PATHS := {
 	"muzzle": "res://scenes/fx/MuzzleFlash.tscn",
 	"explosion": "res://scenes/fx/Explosion.tscn",
@@ -44,6 +45,7 @@ var tower_container: Node2D
 var enemy_container: Node2D
 var projectile_container: Node2D
 var effect_container: Node2D
+var enemy_legs_layer: Node2D
 
 var base_health: int = 100
 var base_max: int = 100
@@ -62,6 +64,27 @@ var stats: Dictionary = {
 	"kills": 0, "leaks": 0, "towers_built": 0, "waves_cleared": 0, "credits_earned": 0,
 }
 
+## Runtime asset cache. Combat paths must never touch ResourceLoader.
+var _fx_scenes: Dictionary = {}
+var _tower_scenes: Dictionary = {}
+var _enemy_scenes: Dictionary = {}
+var _beam_scene: PackedScene
+var _tesla_scene: PackedScene
+var _damage_scene: PackedScene
+var _mine_scene: PackedScene
+var _orbital_scene: PackedScene
+var _drone_scene: PackedScene
+var _damage_label_count: int = 0
+
+## Older versions spawn one Label and one full FX scene per hit, which collapses
+## late waves. Keep the readable feedback but bound the live node count.
+const MAX_LIVE_EFFECTS := 90
+const MAX_DAMAGE_LABELS := 32
+const LOW_PRIORITY_FX := {
+	"hit": true, "muzzle": true, "trail": true, "dust": true,
+	"heal": true, "acid": true, "frost": true,
+}
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -75,10 +98,12 @@ func _ready() -> void:
 	base_health = base_max
 	game_speed = clampi(int(GameState.settings.get("speed", 1)), 1, 3)
 	_load_registries()
+	_preload_assets()
 	_setup_containers()
 	_setup_managers()
 	_setup_camera()
 	_setup_scene_nodes()
+	_bake_static_layers.call_deferred()
 	_setup_ghosts()
 	hud = get_node_or_null("HUD")
 	if hud and hud.has_method("setup"):
@@ -109,6 +134,23 @@ func _load_registries() -> void:
 			enemy_registry[id] = load(res_path)
 
 
+func _preload_assets() -> void:
+	# One load per asset per level, then combat only instantiates PackedScenes.
+	for key in FX_PATHS:
+		var scene: PackedScene = load(String(FX_PATHS[key]))
+		if scene != null:
+			_fx_scenes[key] = scene
+	_beam_scene = load("res://scenes/fx/Beam.tscn")
+	_tesla_scene = load("res://scenes/fx/TeslaArc.tscn")
+	_damage_scene = load("res://scenes/ui/DamageNumber.tscn")
+	_mine_scene = load("res://scenes/towers/ProximityMine.tscn")
+	_orbital_scene = load("res://scenes/fx/OrbitalStrike.tscn")
+	_drone_scene = load("res://scenes/fx/AbilityDrone.tscn")
+	_damage_label_count = 0
+	# Bake all enemy bodies into one atlas once per session.
+	ENEMY_VISUAL_SCRIPT.bake_atlas(self, enemy_registry.values())
+
+
 func _setup_containers() -> void:
 	tower_container = Node2D.new()
 	tower_container.name = "Towers"
@@ -126,6 +168,12 @@ func _setup_containers() -> void:
 	effect_container.name = "Effects"
 	effect_container.z_index = 40
 	add_child(effect_container)
+	# One batched canvas item for every enemy's legs (see EnemyLegsLayer.gd).
+	enemy_legs_layer = Node2D.new()
+	enemy_legs_layer.name = "EnemyLegsLayer"
+	enemy_legs_layer.z_index = 11
+	enemy_legs_layer.set_script(load("res://scripts/enemies/EnemyLegsLayer.gd"))
+	add_child(enemy_legs_layer)
 
 
 func _setup_managers() -> void:
@@ -190,6 +238,50 @@ func _setup_scene_nodes() -> void:
 		var base_pos := Vector2(GameConfig.MAP_ORIGIN.x + 21.0 * GameConfig.CELL_SIZE + 20.0,
 			(end_a.y + end_b.y) * 0.5)
 		base_core.call("setup", self, base_pos)
+
+
+func _bake_static_layers() -> void:
+	# The terrain, both roads and the build grid never change after setup, yet
+	# they used to submit ~1100 canvas draw commands every frame. Render each
+	# static layer group into a texture once, then draw a single sprite.
+	await _bake_layer_group("terrain", ["Terrain", "PathNetwork"], -20)
+	await _bake_layer_group("grid", ["GridOverlay"], 2)
+
+
+func _bake_layer_group(layer_name: String, node_names: Array, bake_z: int) -> void:
+	var nodes: Array[Node2D] = []
+	for node_name in node_names:
+		var node := get_node_or_null(String(node_name))
+		if node is Node2D:
+			nodes.append(node)
+	if nodes.is_empty():
+		return
+	var viewport := SubViewport.new()
+	viewport.name = "BakeViewport_%s" % layer_name
+	viewport.size = Vector2i(
+		int(ProjectSettings.get_setting("display/window/size/viewport_width", 1600)),
+		int(ProjectSettings.get_setting("display/window/size/viewport_height", 900)))
+	viewport.transparent_bg = true
+	viewport.disable_3d = true
+	# GLES3 (and therefore the Web export) does not support 2D MSAA render
+	# targets; an inherited project MSAA setting would spam warnings.
+	viewport.msaa_2d = Viewport.MSAA_DISABLED
+	add_child(viewport)
+	for node in nodes:
+		if node.get_parent() != null:
+			node.get_parent().remove_child(node)
+		viewport.add_child(node)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	await RenderingServer.frame_post_draw
+	var baked := Sprite2D.new()
+	# Keep the original node name so external code and debug toggles still work.
+	baked.name = String(node_names[0])
+	baked.texture = viewport.get_texture()
+	baked.centered = false
+	baked.z_index = bake_z
+	baked.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	add_child(baked)
+	viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 
 
 func _setup_ghosts() -> void:
@@ -375,7 +467,10 @@ func try_place_tower(cell: Vector2i) -> bool:
 		return false
 	if not economy.spend(build_data.cost):
 		return false
-	var scene: PackedScene = load(scene_path)
+	var scene: PackedScene = _tower_scenes.get(scene_path)
+	if scene == null:
+		scene = load(scene_path)
+		_tower_scenes[scene_path] = scene
 	var tower = scene.instantiate()
 	tower_container.add_child(tower)
 	tower.call("setup", self, cell)
@@ -580,7 +675,10 @@ func spawn_enemy(enemy_id: String, path_id: int) -> bool:
 	if scene_path == "" or not ResourceLoader.exists(scene_path):
 		push_warning("Missing enemy scene: %s" % scene_path)
 		return false
-	var scene: PackedScene = load(scene_path)
+	var scene: PackedScene = _enemy_scenes.get(scene_path)
+	if scene == null:
+		scene = load(scene_path)
+		_enemy_scenes[scene_path] = scene
 	var enemy = scene.instantiate()
 	enemy_container.add_child(enemy)
 	enemy.call("setup", self, path_id)
@@ -650,8 +748,9 @@ func _cancel_actions() -> void:
 
 
 func ability_orbital_strike(position: Vector2, radius: float, damage: float, delay: float) -> void:
-	var scene: PackedScene = load("res://scenes/fx/OrbitalStrike.tscn")
-	var strike = scene.instantiate()
+	if _orbital_scene == null:
+		return
+	var strike = _orbital_scene.instantiate()
 	effect_container.add_child(strike)
 	strike.call("configure", self, radius, damage, delay, Color(1.0, 0.55, 0.2))
 	strike.global_position = position
@@ -673,9 +772,10 @@ func ability_emp(position: Vector2, radius: float, damage: float, stun: float, s
 
 
 func ability_deploy_drones(position: Vector2, radius: float, duration: float, damage: float) -> void:
-	var scene: PackedScene = load("res://scenes/fx/AbilityDrone.tscn")
+	if _drone_scene == null:
+		return
 	for i in 2:
-		var drone = scene.instantiate()
+		var drone = _drone_scene.instantiate()
 		effect_container.add_child(drone)
 		drone.call("configure", self, position, radius, duration, damage, i)
 		drone.global_position = position
@@ -699,16 +799,18 @@ func ability_supply_drop(credits: int) -> void:
 
 
 func spawn_orbital_beam(position: Vector2, radius: float, damage: float, delay: float, color: Color) -> void:
-	var scene: PackedScene = load("res://scenes/fx/OrbitalStrike.tscn")
-	var strike = scene.instantiate()
+	if _orbital_scene == null:
+		return
+	var strike = _orbital_scene.instantiate()
 	effect_container.add_child(strike)
 	strike.call("configure", self, radius, damage, delay, color)
 	strike.global_position = position
 
 
 func spawn_mine(position: Vector2, damage: float, radius: float) -> void:
-	var scene: PackedScene = load("res://scenes/towers/ProximityMine.tscn")
-	var mine = scene.instantiate()
+	if _mine_scene == null:
+		return
+	var mine = _mine_scene.instantiate()
 	effect_container.add_child(mine)
 	mine.global_position = position
 	mine.call("configure", self, damage, radius)
@@ -726,10 +828,15 @@ func add_projectile(projectile: Node) -> void:
 
 
 func spawn_fx_at(style: String, position: Vector2, color: Color, radius: float = 24.0) -> void:
-	var path := String(FX_PATHS.get(style, FX_PATHS["hit"]))
-	if not ResourceLoader.exists(path):
+	var scene: PackedScene = _fx_scenes.get(style)
+	if scene == null:
 		return
-	var scene: PackedScene = load(path)
+	# Under a late-wave storm, skip cosmetic sparks first instead of letting the
+	# effects container grow without bound.
+	if LOW_PRIORITY_FX.has(style):
+		var live := effect_container.get_child_count() - _damage_label_count
+		if live >= MAX_LIVE_EFFECTS:
+			return
 	var fx = scene.instantiate()
 	effect_container.add_child(fx)
 	fx.global_position = position
@@ -738,10 +845,9 @@ func spawn_fx_at(style: String, position: Vector2, color: Color, radius: float =
 
 
 func spawn_beam(from: Vector2, to: Vector2, color: Color, duration: float, style: String = "beam") -> void:
-	var path := "res://scenes/fx/TeslaArc.tscn" if style == "tesla" else "res://scenes/fx/Beam.tscn"
-	if not ResourceLoader.exists(path):
+	var scene: PackedScene = _tesla_scene if style == "tesla" else _beam_scene
+	if scene == null:
 		return
-	var scene: PackedScene = load(path)
 	var beam = scene.instantiate()
 	effect_container.add_child(beam)
 	beam.set("style", style)
@@ -759,13 +865,18 @@ func spawn_hit_fx(position: Vector2, kind: String, color: Color) -> void:
 
 
 func spawn_damage_text(position: Vector2, text: String, color: Color) -> void:
-	var scene: PackedScene = load("res://scenes/ui/DamageNumber.tscn")
-	if scene == null:
+	if _damage_scene == null or _damage_label_count >= MAX_DAMAGE_LABELS:
 		return
-	var label = scene.instantiate()
+	var label = _damage_scene.instantiate()
 	effect_container.add_child(label)
+	_damage_label_count += 1
+	label.tree_exiting.connect(_on_damage_label_exiting)
 	label.global_position = position
 	label.call("setup", text, color)
+
+
+func _on_damage_label_exiting() -> void:
+	_damage_label_count = maxi(0, _damage_label_count - 1)
 
 
 func _on_damage_number(world_position: Vector2, amount: float, kind: String) -> void:

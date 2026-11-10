@@ -40,10 +40,19 @@ var moving: bool = false
 var hit_flash: float = 0.0
 
 var lane_offset: Vector2 = Vector2.ZERO
-var _dot_number_timer: float = 0.0
-var _dot_damage: float = 0.0
+var _number_timer: float = 0.0
+var _pending_damage: float = 0.0
+var _pending_kind: String = "kinetic"
 var _visual: Node2D
 var _health_bar: Node2D
+
+## Lightweight opt-in profiler used by tests/StressTest.gd.
+static var prof_enabled: bool = false
+static var prof_calls: int = 0
+static var prof_total_usec: int = 0
+static var prof_path_usec: int = 0
+static var prof_status_usec: int = 0
+static var prof_visual_usec: int = 0
 
 
 func _ready() -> void:
@@ -87,6 +96,7 @@ func setup(owner_level: Node, assigned_path: int) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	var prof_start := Time.get_ticks_usec() if prof_enabled else 0
 	if dead or removed or level == null:
 		return
 	if not level.simulation_running or level.match_finished:
@@ -95,7 +105,7 @@ func _physics_process(delta: float) -> void:
 	step = minf(step, GameConfig.MAX_DELTA * 3.0)
 	time_since_damage += step
 	hit_flash = maxf(0.0, hit_flash - step)
-	_dot_number_timer -= step
+	_number_timer -= step
 
 	_update_statuses(step)
 	_update_shield(step)
@@ -104,6 +114,10 @@ func _physics_process(delta: float) -> void:
 	_update_burrow(step)
 	_update_boss(step)
 
+	if prof_enabled:
+		var after_status := Time.get_ticks_usec()
+		prof_status_usec += after_status - prof_start
+		prof_start = after_status
 	if stun_timer > 0.0 or freeze_timer > 0.0:
 		moving = false
 		_tick_visual()
@@ -136,13 +150,15 @@ func _physics_process(delta: float) -> void:
 	if _visual:
 		_visual.rotation = (ahead - point).angle()
 	_tick_visual()
+	if prof_enabled:
+		var after_path := Time.get_ticks_usec()
+		prof_path_usec += after_path - prof_start
+		prof_calls += 1
 
 
 func _tick_visual() -> void:
 	if _visual and _visual.has_method("set_state"):
 		_visual.set_state(moving, stun_timer > 0.0 or freeze_timer > 0.0, hit_flash > 0.0, burrow_active)
-	if _health_bar:
-		_health_bar.queue_redraw()
 
 
 func _update_statuses(step: float) -> void:
@@ -165,10 +181,10 @@ func _update_statuses(step: float) -> void:
 				receive_damage(burn_dps * 0.35, "fire", burn_source, true)
 			if burn_timer <= 0.0:
 				burn_dps = 0.0
-	if _dot_number_timer <= 0.0 and _dot_damage > 0.0:
-		EventBus.damage_number.emit(global_position + Vector2(0, -28), _dot_damage, "fire")
-		_dot_damage = 0.0
-		_dot_number_timer = 0.55
+	if _number_timer <= 0.0 and _pending_damage > 0.0:
+		EventBus.damage_number.emit(global_position + Vector2(0, -30), _pending_damage, _pending_kind)
+		_pending_damage = 0.0
+		_number_timer = 0.2
 
 
 func _update_shield(step: float) -> void:
@@ -186,10 +202,11 @@ func _update_healer(step: float) -> void:
 		return
 	heal_timer = float(enemy_data.heal_interval)
 	var healed := 0
-	for other in get_tree().get_nodes_in_group("enemies"):
+	var heal_radius_sq := float(enemy_data.heal_radius) * float(enemy_data.heal_radius)
+	for other in TargetingSystem.enemies(get_tree()):
 		if other == null or not is_instance_valid(other) or other == self or other.dead:
 			continue
-		if global_position.distance_to(other.global_position) > float(enemy_data.heal_radius):
+		if global_position.distance_squared_to(other.global_position) > heal_radius_sq:
 			continue
 		if other.health >= other.max_health:
 			continue
@@ -209,11 +226,11 @@ func _update_spitter(step: float) -> void:
 	if spit_timer > 0.0:
 		return
 	var target: Node = null
-	var best := float(enemy_data.ranged_range)
-	for tower in get_tree().get_nodes_in_group("towers"):
+	var best := float(enemy_data.ranged_range) * float(enemy_data.ranged_range)
+	for tower in TargetingSystem.towers(get_tree()):
 		if tower == null or not is_instance_valid(tower):
 			continue
-		var d: float = global_position.distance_to(tower.global_position)
+		var d: float = global_position.distance_squared_to(tower.global_position)
 		if d < best:
 			best = d
 			target = tower
@@ -291,10 +308,11 @@ func receive_damage(amount: float, damage_type: String, source: Node = null, is_
 			AudioManager.play_sound("shield_break", 0.55, 0.9)
 	var applied := remaining
 	health -= remaining
-	if is_dot:
-		_dot_damage += applied
-	elif applied > 0.0:
-		EventBus.damage_number.emit(global_position + Vector2(0, -30), applied, damage_type)
+	if applied > 0.0:
+		# Aggregate rapid hits into one floating number per enemy instead of
+		# creating a Label for every single hit.
+		_pending_damage += applied
+		_pending_kind = damage_type
 	if not is_dot:
 		AudioManager.play_sound("enemy_hit", 0.22, randf_range(0.9, 1.12))
 	if enemy_data.is_boss:
@@ -384,6 +402,9 @@ func _leak() -> void:
 func _die(source: Node) -> void:
 	if dead:
 		return
+	if _pending_damage > 0.0:
+		EventBus.damage_number.emit(global_position + Vector2(0, -30), _pending_damage, _pending_kind)
+		_pending_damage = 0.0
 	dead = true
 	removed = true
 	health = 0.0

@@ -76,12 +76,10 @@ func _physics_process(delta: float) -> void:
 	global_position += direction * speed * step
 	_trail_timer -= step
 	if _trail_timer <= 0.0:
-		_trail_timer = 0.035
+		_trail_timer = 0.05
 		trail_points.append(global_position)
 		if trail_points.size() > 7:
 			trail_points.pop_front()
-		if projectile_style == "missile" and level:
-			level.call("spawn_fx_at", "trail", global_position, Color(0.6, 0.55, 0.5, 0.6), 6.0)
 	queue_redraw()
 	if is_instance_valid(target) and target.is_targetable():
 		var hit_radius := 13.0
@@ -141,6 +139,11 @@ func _expire() -> void:
 
 func _draw() -> void:
 	if projectile_style == "missile":
+		if trail_points.size() > 1:
+			var trail := PackedVector2Array()
+			for point in trail_points:
+				trail.append(to_local(point))
+			draw_polyline(trail, Color(0.7, 0.65, 0.6, 0.28), 3.0, true)
 		draw_line(Vector2.ZERO, -direction * 16.0, Color(0.7, 0.65, 0.6, 0.35), 3.0, true)
 		draw_circle(Vector2.ZERO, 4.0, color)
 		draw_circle(Vector2.ZERO, 2.0, Color(1, 0.95, 0.8))
