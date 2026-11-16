@@ -81,7 +81,7 @@ func _run() -> void:
 		lose.call("setup", {
 			"level_number": 1, "stars": 0, "failed": true,
 			"stats": {"kills": 12, "leaks": 9, "base_health": 0, "base_max": 100,
-				"credits_earned": 140, "time": 120.0, "level_name": "Landing Zone"},
+				"credits_earned": 140, "time": 120.0, "level_name": Loc.t("Landing Zone")},
 		}, level)
 	await _wait(10)
 	await _shot("11_defeat")

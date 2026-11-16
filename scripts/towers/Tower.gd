@@ -19,7 +19,6 @@ var _deploy_timer: float = 0.0
 var _visual: Node2D
 var _range_indicator: Node2D
 var _muzzle: Marker2D
-var _animation_player: AnimationPlayer
 var _audio_player: AudioStreamPlayer
 
 ## Support auras change only when a relay is built, upgraded or sold. Rescan
@@ -36,7 +35,6 @@ func _ready() -> void:
 	_visual = get_node_or_null("Visual")
 	_range_indicator = get_node_or_null("RangeIndicator")
 	_muzzle = get_node_or_null("Muzzle")
-	_animation_player = get_node_or_null("AnimationPlayer")
 	_audio_player = get_node_or_null("AudioStreamPlayer")
 	if tower_data != null:
 		invested = tower_data.cost
@@ -74,8 +72,6 @@ func _physics_process(delta: float) -> void:
 	if _support_timer <= 0.0:
 		_support_timer = 0.25
 		_support_cache = _scan_support_bonus()
-	if _animation_player and _animation_player.is_playing():
-		pass
 	if disabled_timer > 0.0:
 		disabled_timer = maxf(0.0, disabled_timer - step)
 		if _visual and _visual.has_method("set_disabled"):
@@ -492,7 +488,7 @@ func upgrade() -> bool:
 		_visual.on_upgrade()
 	EventBus.tower_upgraded.emit(self)
 	AudioManager.play_sound("upgrade", 0.65, 1.0)
-	EventBus.notification.emit("%s upgraded to Mk %d" % [tower_data.display_name, current_level], GameConfig.AMBER)
+	EventBus.notification.emit(Loc.tf("%s upgraded to Mk %d", [Loc.t(tower_data.display_name), current_level]), GameConfig.AMBER)
 	return true
 
 

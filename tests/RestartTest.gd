@@ -86,6 +86,6 @@ func _find_button(root: Node, text: String) -> Button:
 	if root == null:
 		return null
 	for button in root.find_children("*", "Button", true, false):
-		if button is Button and button.text == text:
+		if button is Button and (button.text == text or button.text == Loc.t(text)):
 			return button
 	return null

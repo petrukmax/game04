@@ -31,6 +31,7 @@ func _run() -> void:
 	await _test_settings_panel()
 	await _test_pause_and_victory()
 	await _test_defeat_overlay()
+	await _test_wave_checkpoint()
 
 	if had_save:
 		SaveManager.save_payload(original)
@@ -183,11 +184,59 @@ func _test_defeat_overlay() -> void:
 	await get_tree().process_frame
 
 
+func _test_wave_checkpoint() -> void:
+	var probe = load(LEVEL_SCENE).instantiate()
+	add_child(probe)
+	await _wait(4)
+	var buildable: Array = probe.grid.buildable_cells()
+	probe.queue_free()
+	await get_tree().process_frame
+	if buildable.is_empty():
+		check(false, "Level exposes a buildable cell for the checkpoint test")
+		return
+	var cell: Vector2i = buildable[0]
+	GameState.current_level_index = 0
+	GameState.store_wave_checkpoint({
+		"version": LevelBase.WAVE_CHECKPOINT_VERSION,
+		"level_index": 0,
+		"waves_cleared": 1,
+		"elapsed": 12.0,
+		"credits": 777,
+		"total_earned": 999,
+		"total_spent": 222,
+		"base_health": 100,
+		"level_time": 42.0,
+		"stats": {"kills": 12, "leaks": 0, "towers_built": 1, "waves_cleared": 1, "credits_earned": 499},
+		"towers": [{"id": "pulse", "cell": [cell.x, cell.y], "level": 2, "invested": 150, "priority": "first"}],
+	})
+	GameState.wave_checkpoint_pending = true
+	var level = load(LEVEL_SCENE).instantiate()
+	add_child(level)
+	await _wait(6)
+	check(level.waves.finished_waves == 1, "Checkpoint restores cleared wave progress")
+	check(level.waves.started_waves == 1, "Checkpoint restores the wave counter")
+	check(level.economy.credits == 777, "Checkpoint restores credits")
+	check(level.grid.occupied.has(cell), "Checkpoint rebuilds every saved tower")
+	var restored = level.grid.occupied.get(cell, null)
+	check(restored != null and int(restored.current_level) == 2, "Checkpoint restores tower upgrades")
+	check(int(level.stats.kills) == 12, "Checkpoint restores battle statistics")
+	level.damage_base(9999)
+	await get_tree().process_frame
+	var defeat = level.find_child("DefeatScreen", true, false)
+	check(defeat != null, "Checkpoint defeat opens the defeat overlay")
+	if defeat != null:
+		check(_find_button(defeat, Loc.tf("RETRY FROM WAVE %d", [2])) != null,
+			"Defeat offers a retry from the previous wave")
+	level.queue_free()
+	await get_tree().process_frame
+	GameState.clear_wave_checkpoint()
+
+
 func _find_button(root: Node, text: String) -> Button:
 	if root == null:
 		return null
 	for button in root.find_children("*", "Button", true, false):
-		if button is Button and button.text == text:
+		if button is Button and (button.text == text or button.text == Loc.t(text)):
 			return button
 	return null
 

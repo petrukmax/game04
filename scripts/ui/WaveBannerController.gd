@@ -39,8 +39,9 @@ func _ready() -> void:
 
 
 func show_wave(index: int, total: int, preview: String) -> void:
-	var boss := preview.to_lower().contains("boss") or preview.to_lower().contains("tyrant")
-	show_message("WAVE %d / %d" % [index, total], preview.to_upper(),
+	var lower := preview.to_lower()
+	var boss := lower.contains("boss") or lower.contains("tyrant") or lower.contains("тиран") or lower.contains("босс")
+	show_message(Loc.tf("WAVE %d / %d", [index, total]), preview.to_upper(),
 		UIStyle.RED if boss else UIStyle.AMBER)
 
 

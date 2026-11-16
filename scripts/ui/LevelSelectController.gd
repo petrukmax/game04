@@ -33,7 +33,7 @@ func _build() -> void:
 	header.custom_minimum_size = Vector2(1488, 0)
 	header.add_theme_constant_override("separation", 12)
 	add_child(header)
-	var back := UIStyle.make_button("‹ MAIN MENU", false, true)
+	var back := UIStyle.make_button(Loc.t("‹ MAIN MENU"), false, true)
 	back.custom_minimum_size = Vector2(140, 42)
 	back.pressed.connect(func():
 		AudioManager.play_ui("ui_cancel")
@@ -44,18 +44,18 @@ func _build() -> void:
 	title_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_box.add_theme_constant_override("separation", 0)
 	header.add_child(title_box)
-	title_box.add_child(UIStyle.make_label("SECTOR SELECT", 26, UIStyle.AMBER))
-	title_box.add_child(UIStyle.make_label("Choose a battlefield. Sectors unlock in order as the campaign advances.",
+	title_box.add_child(UIStyle.make_label(Loc.t("SECTOR SELECT"), 26, UIStyle.AMBER))
+	title_box.add_child(UIStyle.make_label(Loc.t("Choose a battlefield. Sectors unlock in order as the campaign advances."),
 		11, UIStyle.MUTED))
 	var stars := 0
 	for key in GameState.best_stars.keys():
 		stars += int(GameState.best_stars[key])
-	header.add_child(UIStyle.make_label("STARS %d / 45" % stars, 15, UIStyle.OFFWHITE))
-	var settings := UIStyle.make_button("SETTINGS", false, true)
+	header.add_child(UIStyle.make_label(Loc.tf("STARS %d / 45", [stars]), 15, UIStyle.OFFWHITE))
+	var settings := UIStyle.make_button(Loc.t("SETTINGS"), false, true)
 	settings.custom_minimum_size = Vector2(110, 42)
 	settings.pressed.connect(_on_settings)
 	header.add_child(settings)
-	var help := UIStyle.make_button("MANUAL", false, true)
+	var help := UIStyle.make_button(Loc.t("MANUAL"), false, true)
 	help.custom_minimum_size = Vector2(100, 42)
 	help.pressed.connect(_on_help)
 	header.add_child(help)
@@ -85,14 +85,14 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 3)
 	margin.add_child(box)
-	_detail_title = UIStyle.make_label("SELECT A SECTOR", 16, UIStyle.AMBER)
+	_detail_title = UIStyle.make_label(Loc.t("SELECT A SECTOR"), 16, UIStyle.AMBER)
 	box.add_child(_detail_title)
-	_detail_body = UIStyle.make_label("Hover a sector for its briefing. Completed sectors show their best star rating.",
+	_detail_body = UIStyle.make_label(Loc.t("Hover a sector for its briefing. Completed sectors show their best star rating."),
 		11, UIStyle.OFFWHITE)
 	_detail_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_detail_body)
 
-	var footer := UIStyle.make_label("Progress and best stars are saved locally after every battle.",
+	var footer := UIStyle.make_label(Loc.t("Progress and best stars are saved locally after every battle."),
 		9, Color(0.5, 0.5, 0.46))
 	footer.position = Vector2(56, 744)
 	add_child(footer)
@@ -143,19 +143,19 @@ func _make_card(index: int) -> Button:
 	var number := UIStyle.make_label("%02d" % data.level_number, 24, UIStyle.AMBER)
 	number.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(number)
-	var name_label := UIStyle.make_label(data.display_name, 14, UIStyle.OFFWHITE)
+	var name_label := UIStyle.make_label(Loc.t(data.display_name), 14, UIStyle.OFFWHITE)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(name_label)
-	var difficulty := UIStyle.make_label(data.difficulty.to_upper(), 9, border)
+	var difficulty := UIStyle.make_label(Loc.t(data.difficulty).to_upper(), 9, border)
 	difficulty.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(difficulty)
 	var star_text := "★ ★ ★" if stars >= 3 else ("★ ★ ☆" if stars == 2 else ("★ ☆ ☆" if stars == 1 else "☆ ☆ ☆"))
 	var star_label := UIStyle.make_label(star_text, 16, UIStyle.AMBER if stars > 0 else UIStyle.MUTED)
 	star_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(star_label)
-	var status := UIStyle.make_label("LOCKED" if not unlocked else ("CLEARED" if stars > 0 else "AVAILABLE"),
+	var status := UIStyle.make_label(Loc.t("LOCKED") if not unlocked else (Loc.t("CLEARED") if stars > 0 else Loc.t("AVAILABLE")),
 		9, UIStyle.RED if not unlocked else (UIStyle.GREEN if stars > 0 else UIStyle.MUTED))
 	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(status)
@@ -175,12 +175,12 @@ func _on_card_hover(index: int, data: LevelData) -> void:
 	if _detail_title == null:
 		return
 	var stars := GameState.level_stars(index)
-	_detail_title.text = "%s  ·  SECTOR %02d  ·  %s  ·  %s" % [
-		data.display_name.to_upper(), data.level_number, data.difficulty.to_upper(),
-		("BEST %d / 3 STARS" % stars) if stars > 0 else "NOT YET CLEARED"]
-	_detail_body.text = "%s\nStart: $%d · Base integrity %d · %d waves · Towers available: %d" % [
-		data.description, data.starting_credits, data.base_health, data.wave_data_list.size(),
-		data.available_towers.size()]
+	_detail_title.text = Loc.tf("%s  ·  SECTOR %02d  ·  %s  ·  %s", [
+		Loc.t(data.display_name).to_upper(), data.level_number, Loc.t(data.difficulty).to_upper(),
+		(Loc.tf("BEST %d / 3 STARS", [stars])) if stars > 0 else Loc.t("NOT YET CLEARED")])
+	_detail_body.text = Loc.tf("%s\nStart: $%d · Base integrity %d · %d waves · Towers available: %d", [
+		Loc.t(data.description), data.starting_credits, data.base_health, data.wave_data_list.size(),
+		data.available_towers.size()])
 	AudioManager.play_ui("ui_hover")
 
 

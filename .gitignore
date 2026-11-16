@@ -12,6 +12,7 @@ exports/
 
 # Local logs and temporary files
 *.log
+*.log.err
 *.tmp
 *_test_*.png
 !tests/web_*.png

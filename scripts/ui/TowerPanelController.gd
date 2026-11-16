@@ -18,7 +18,7 @@ var _priority_ids: Array[String] = ["first", "last", "strongest", "weakest", "cl
 
 func _ready() -> void:
 	visible = false
-	custom_minimum_size = Vector2(326, 380)
+	custom_minimum_size = Vector2(372, 380)
 	add_theme_stylebox_override("panel", UIStyle.panel_box(UIStyle.BG_DEEP, Color(0.44, 0.34, 0.18), 1, 3))
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 12)
@@ -35,16 +35,16 @@ func _ready() -> void:
 	var title_box := VBoxContainer.new()
 	title_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(title_box)
-	_name_label = UIStyle.make_label("Tower", 17, UIStyle.AMBER)
+	_name_label = UIStyle.make_label(Loc.t("Tower"), 17, UIStyle.AMBER)
 	title_box.add_child(_name_label)
-	_level_label = UIStyle.make_label("Mk 1 / 4", 11, UIStyle.MUTED)
+	_level_label = UIStyle.make_label(Loc.t("Mk 1 / 4"), 11, UIStyle.MUTED)
 	title_box.add_child(_level_label)
 	var close := UIStyle.make_button("X", false, true)
 	close.custom_minimum_size = Vector2(30, 28)
 	close.pressed.connect(_on_close)
 	top.add_child(close)
 
-	_role_label = UIStyle.make_label("Role", 11, UIStyle.OFFWHITE)
+	_role_label = UIStyle.make_label(Loc.t("Role"), 11, UIStyle.OFFWHITE)
 	vbox.add_child(_role_label)
 	vbox.add_child(UIStyle.separator(true))
 	_stats_label = UIStyle.make_label("", 12, UIStyle.OFFWHITE)
@@ -58,36 +58,38 @@ func _ready() -> void:
 	var upgrade_row := HBoxContainer.new()
 	upgrade_row.add_theme_constant_override("separation", 6)
 	vbox.add_child(upgrade_row)
-	_upgrade_button = UIStyle.make_button("UPGRADE", true, true)
+	_upgrade_button = UIStyle.make_button(Loc.t("UPGRADE"), true, true)
 	_upgrade_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_upgrade_button.custom_minimum_size = Vector2(0, 36)
 	_upgrade_button.pressed.connect(_on_upgrade)
 	upgrade_row.add_child(_upgrade_button)
-	_sell_button = UIStyle.make_button("SELL", false, true)
-	_sell_button.custom_minimum_size = Vector2(92, 36)
+	_sell_button = UIStyle.make_button(Loc.t("SELL"), false, true)
+	_sell_button.custom_minimum_size = Vector2(84, 36)
 	_sell_button.pressed.connect(_on_sell)
 	upgrade_row.add_child(_sell_button)
 
 	var target_row := HBoxContainer.new()
 	target_row.add_theme_constant_override("separation", 6)
 	vbox.add_child(target_row)
-	target_row.add_child(UIStyle.make_label("TARGET", 10, UIStyle.MUTED))
+	target_row.add_child(UIStyle.make_label(Loc.t("TARGET"), 10, UIStyle.MUTED))
 	_targeting = OptionButton.new()
 	_targeting.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_targeting.add_theme_font_size_override("font_size", 11)
 	_targeting.add_theme_color_override("font_color", UIStyle.OFFWHITE)
 	_targeting.add_theme_stylebox_override("normal", UIStyle.panel_box(UIStyle.BG_RAISED, Color(0.35, 0.31, 0.24), 1, 2))
 	_targeting.add_theme_stylebox_override("hover", UIStyle.panel_box(Color(0.18, 0.18, 0.19), UIStyle.AMBER, 1, 2))
-	_targeting.add_item("First", 0)
-	_targeting.add_item("Last", 1)
-	_targeting.add_item("Strongest", 2)
-	_targeting.add_item("Weakest", 3)
-	_targeting.add_item("Closest", 4)
-	_targeting.add_item("Highest HP", 5)
-	_targeting.add_item("Flying first", 6)
+	_targeting.add_item(Loc.t("First"), 0)
+	_targeting.add_item(Loc.t("Last"), 1)
+	_targeting.add_item(Loc.t("Strongest"), 2)
+	_targeting.add_item(Loc.t("Weakest"), 3)
+	_targeting.add_item(Loc.t("Closest"), 4)
+	_targeting.add_item(Loc.t("Highest HP"), 5)
+	_targeting.add_item(Loc.t("Flying first"), 6)
 	_targeting.item_selected.connect(_on_targeting_changed)
 	target_row.add_child(_targeting)
-	_range_label = UIStyle.make_label("Range ring is shown while this tower is selected.", 10, UIStyle.MUTED)
+	_range_label = UIStyle.make_label(Loc.t("Range ring is shown while this tower is selected."), 10, UIStyle.MUTED)
+	_range_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_range_label.custom_minimum_size = Vector2(0, 0)
 	vbox.add_child(_range_label)
 
 
@@ -111,54 +113,55 @@ func refresh() -> void:
 		clear()
 		return
 	var stats: Dictionary = tower.stats
-	_name_label.text = tower.tower_data.display_name
-	_level_label.text = "Mk %d / %d · %s" % [tower.current_level, tower.tower_data.max_level, tower.tower_data.role]
-	_role_label.text = "Damage type: %s" % tower.tower_data.damage_type.to_upper()
+	_name_label.text = Loc.t(tower.tower_data.display_name)
+	_level_label.text = Loc.tf("Mk %d / %d · %s", [tower.current_level, tower.tower_data.max_level, Loc.t(tower.tower_data.role)])
+	_role_label.text = Loc.tf("Damage type: %s", [Loc.t(tower.tower_data.damage_type).to_upper()])
 	var lines := PackedStringArray()
 	if float(stats.get("damage", 0.0)) > 0.0:
-		lines.append("Damage        %s" % _num(stats.damage))
+		lines.append(Loc.tf("Damage        %s", [_num(stats.damage)]))
 	if float(stats.get("attack_rate", 0.0)) > 0.0:
 		var dps := float(stats.damage) * float(stats.attack_rate)
-		lines.append("Fire rate     %.2f /s   (%.0f DPS)" % [float(stats.attack_rate), dps])
+		lines.append(Loc.tf("Fire rate     %.2f /s   (%.0f DPS)", [float(stats.attack_rate), dps]))
 	if float(stats.get("attack_range", 0.0)) > 0.0:
-		lines.append("Range         %d" % int(stats.attack_range))
+		lines.append(Loc.tf("Range         %d", [int(stats.attack_range)]))
 	if float(stats.get("splash_radius", 0.0)) > 0.0:
-		lines.append("Splash        %d" % int(stats.splash_radius))
+		lines.append(Loc.tf("Splash        %d", [int(stats.splash_radius)]))
 	if float(stats.get("slow_amount", 0.0)) > 0.0:
-		lines.append("Slow          %d%% for %.1fs" % [int(float(stats.slow_amount) * 100.0), float(stats.slow_duration)])
+		lines.append(Loc.tf("Slow          %d%% for %.1fs", [int(float(stats.slow_amount) * 100.0), float(stats.slow_duration)]))
 	if float(stats.get("armor_penetration", 0.0)) > 0.0:
-		lines.append("Armour pen.   %d%%" % int(float(stats.armor_penetration) * 100.0))
+		lines.append(Loc.tf("Armour pen.   %d%%", [int(float(stats.armor_penetration) * 100.0)]))
 	if int(stats.get("chain_count", 0)) > 0:
-		lines.append("Chain targets %d" % (int(stats.chain_count) + 1))
+		lines.append(Loc.tf("Chain targets %d", [int(stats.chain_count) + 1]))
 	if float(stats.get("burn_dps", 0.0)) > 0.0:
-		lines.append("Burn          %.0f /s for %.1fs" % [float(stats.burn_dps), float(stats.burn_duration) + float(tower._flame_bonus_duration())])
+		lines.append(Loc.tf("Burn          %.0f /s for %.1fs", [float(stats.burn_dps), float(stats.burn_duration) + float(tower._flame_bonus_duration())]))
 	if int(stats.get("missiles", 1)) > 1:
-		lines.append("Missiles      %d per salvo" % int(stats.missiles))
+		lines.append(Loc.tf("Missiles      %d per salvo", [int(stats.missiles)]))
 	if float(stats.get("support_radius", 0.0)) > 0.0:
-		lines.append("Command aura  %d radius" % int(stats.support_radius))
-		lines.append("Tower buff    +%d%%" % int(float(stats.support_buff) * 100.0))
+		lines.append(Loc.tf("Command aura  %d radius", [int(stats.support_radius)]))
+		lines.append(Loc.tf("Tower buff    +%d%%", [int(float(stats.support_buff) * 100.0)]))
 	if int(stats.get("income_per_wave", 0)) > 0:
-		lines.append("Stipend       +%d / wave" % int(stats.income_per_wave))
+		lines.append(Loc.tf("Stipend       +%d / wave", [int(stats.income_per_wave)]))
 	if float(stats.get("deploy_interval", 0.0)) > 0.0:
-		lines.append("Mine reload   %.1fs · %d blast" % [float(stats.deploy_interval), int(stats.mine_damage)])
-	lines.append("Targets air   %s" % ("YES" if GameConfig.as_bool(stats.get("anti_air", false)) else "NO"))
+		lines.append(Loc.tf("Mine reload   %.1fs · %d blast", [float(stats.deploy_interval), int(stats.mine_damage)]))
+	lines.append(Loc.tf("Targets air   %s", [Loc.t("YES") if GameConfig.as_bool(stats.get("anti_air", false)) else Loc.t("NO")]))
 	_stats_label.text = "\n".join(lines)
 
 	var next: UpgradeData = tower.next_upgrade()
 	if next == null:
-		_next_label.text = "Maximum upgrade level reached. This tower is fully upgraded."
-		_upgrade_button.text = "MAX LEVEL"
+		_next_label.text = Loc.t("Maximum upgrade level reached. This tower is fully upgraded.")
+		_upgrade_button.text = Loc.t("MAX LEVEL")
 		_upgrade_button.disabled = true
 	else:
-		_next_label.text = "NEXT — %s ($%d)\n%s" % [next.display_name, next.cost, next.description]
-		_upgrade_button.text = "UPGRADE  $%d" % next.cost
+		_next_label.text = Loc.tf("NEXT — %s ($%d)\n%s", [Loc.t(next.display_name), next.cost, Loc.t(next.description)])
+		_upgrade_button.text = Loc.tf("UPGRADE  $%d", [next.cost])
 		_upgrade_button.disabled = not tower.can_upgrade()
-		_upgrade_button.tooltip_text = "Not enough credits." if not tower.can_upgrade() else next.description
-	_sell_button.text = "SELL  +$%d" % tower.sell_value()
-	_sell_button.tooltip_text = "Refund %d%% of invested credits." % int(tower.tower_data.sell_ratio * 100.0)
+		_upgrade_button.tooltip_text = Loc.t("Not enough credits.") if not tower.can_upgrade() else Loc.t(next.description)
+	_sell_button.text = Loc.t("SELL")
+	_sell_button.tooltip_text = Loc.tf("Sell for $%d — refund %d%% of invested credits.", [
+		tower.sell_value(), int(tower.tower_data.sell_ratio * 100.0)])
 	var index := _priority_ids.find(tower.targeting_priority)
 	_targeting.selected = maxi(0, index)
-	_range_label.text = "Range %d · invested $%d · select target priority for this tower." % [int(stats.get("attack_range", 0.0)), int(tower.invested)]
+	_range_label.text = Loc.tf("Range %d · invested $%d · select target priority for this tower.", [int(stats.get("attack_range", 0.0)), int(tower.invested)])
 
 
 func _on_upgrade() -> void:

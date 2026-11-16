@@ -1,5 +1,7 @@
 extends VBoxContainer
 ## Ten-card tower shop, animated affordability and build-mode highlighting.
+## The old "shop" header and ability bar were removed by user request; the full
+## bottom-bar width is now used for larger tower icons and two-line names.
 
 var hud: CanvasLayer
 var level: LevelBase
@@ -10,24 +12,19 @@ var selected_id: String = ""
 func setup(owner_hud: CanvasLayer, owner_level: LevelBase) -> void:
 	hud = owner_hud
 	level = owner_level
-	add_theme_constant_override("separation", 4)
+	add_theme_constant_override("separation", 2)
 	for child in get_children():
 		child.queue_free()
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 10)
-	var title := UIStyle.make_label("DEFENCE GRID / TOWER SHOP", 12, UIStyle.AMBER)
-	header.add_child(title)
-	var hint := UIStyle.make_label("1–0 select · click a buildable cell · right-click cancel", 10, UIStyle.MUTED)
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(hint)
-	add_child(header)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	add_child(row)
 	var card_scene: PackedScene = load("res://scenes/ui/TowerCard.tscn")
 	for data in level.get_all_tower_data():
 		var card = card_scene.instantiate()
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		row.add_child(card)
 		card.call("setup", data, hud, level)
 		cards[data.id] = card

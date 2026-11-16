@@ -30,14 +30,14 @@ func _build() -> void:
 	header.custom_minimum_size = Vector2(620, 0)
 	header.add_theme_constant_override("separation", 0)
 	add_child(header)
-	header.add_child(UIStyle.make_label("FIRST BASTION COMMAND", 13, UIStyle.AMBER))
-	var title := UIStyle.make_label("MARS\nARACHNID\nDEFENSE", 52, UIStyle.OFFWHITE)
+	header.add_child(UIStyle.make_label(Loc.t("FIRST BASTION COMMAND"), 13, UIStyle.AMBER))
+	var title := UIStyle.make_label(Loc.t("MARS\nARACHNID\nDEFENSE"), 52, UIStyle.OFFWHITE)
 	title.add_theme_color_override("font_shadow_color", Color(0.25, 0.06, 0.02, 0.8))
 	title.add_theme_constant_override("shadow_offset_x", 3)
 	title.add_theme_constant_override("shadow_offset_y", 4)
 	title.add_theme_constant_override("line_spacing", -8)
 	header.add_child(title)
-	var subtitle := UIStyle.make_label("Hold the first human outpost against the Martian brood.", 14, UIStyle.MUTED)
+	var subtitle := UIStyle.make_label(Loc.t("Hold the first human outpost against the Martian brood."), 14, UIStyle.MUTED)
 	header.add_child(subtitle)
 
 	var menu := VBoxContainer.new()
@@ -46,18 +46,18 @@ func _build() -> void:
 	menu.add_theme_constant_override("separation", 6)
 	add_child(menu)
 
-	var continue_text := "START CAMPAIGN"
+	var continue_text := Loc.t("START CAMPAIGN")
 	if GameState.campaign_started:
-		continue_text = "CONTINUE — SECTOR %02d" % GameState.unlocked_level
+		continue_text = Loc.tf("CONTINUE — SECTOR %02d", [GameState.unlocked_level])
 	menu.add_child(_menu_button(continue_text, true, _on_continue))
-	menu.add_child(_menu_button("NEW CAMPAIGN", false, _on_new_campaign))
-	menu.add_child(_menu_button("SECTOR SELECT", false, _on_level_select))
-	menu.add_child(_menu_button("SETTINGS", false, _on_settings))
-	menu.add_child(_menu_button("FIELD MANUAL", false, _on_help))
+	menu.add_child(_menu_button(Loc.t("NEW CAMPAIGN"), false, _on_new_campaign))
+	menu.add_child(_menu_button(Loc.t("SECTOR SELECT"), false, _on_level_select))
+	menu.add_child(_menu_button(Loc.t("SETTINGS"), false, _on_settings))
+	menu.add_child(_menu_button(Loc.t("FIELD MANUAL"), false, _on_help))
 	if OS.has_feature("web"):
-		menu.add_child(_menu_button("RELOAD GAME", false, _on_reload_game))
+		menu.add_child(_menu_button(Loc.t("RELOAD GAME"), false, _on_reload_game))
 	else:
-		menu.add_child(_menu_button("QUIT TO DESKTOP", false, _on_quit))
+		menu.add_child(_menu_button(Loc.t("QUIT TO DESKTOP"), false, _on_quit))
 
 	var info := PanelContainer.new()
 	info.add_theme_stylebox_override("panel", UIStyle.panel_box(Color(0.04, 0.04, 0.05, 0.8), Color(0.4, 0.3, 0.17), 1, 3))
@@ -73,23 +73,23 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 5)
 	margin.add_child(box)
-	box.add_child(UIStyle.make_label("CAMPAIGN RECORD", 11, UIStyle.AMBER))
+	box.add_child(UIStyle.make_label(Loc.t("CAMPAIGN RECORD"), 11, UIStyle.AMBER))
 	box.add_child(UIStyle.separator(true))
 	var stars := 0
 	for key in GameState.best_stars.keys():
 		stars += int(GameState.best_stars[key])
-	box.add_child(_stat_line("Sectors unlocked", "%d / 15" % GameState.unlocked_level))
-	box.add_child(_stat_line("Sectors completed", "%d / 15" % GameState.total_levels))
-	box.add_child(_stat_line("Stars earned", "%d / 45" % stars))
-	box.add_child(_stat_line("Arachnids killed", str(GameState.total_kills)))
-	box.add_child(_stat_line("Credits earned", "$%d" % GameState.total_credits))
+	box.add_child(_stat_line(Loc.t("Sectors unlocked"), "%d / 15" % GameState.unlocked_level))
+	box.add_child(_stat_line(Loc.t("Sectors completed"), "%d / 15" % GameState.total_levels))
+	box.add_child(_stat_line(Loc.t("Stars earned"), "%d / 45" % stars))
+	box.add_child(_stat_line(Loc.t("Arachnids killed"), str(GameState.total_kills)))
+	box.add_child(_stat_line(Loc.t("Credits earned"), "$%d" % GameState.total_credits))
 	box.add_child(UIStyle.separator(true))
 	_status_label = UIStyle.make_label("", 10, UIStyle.MUTED)
 	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_status_label)
 	_refresh_status()
 
-	var footer := UIStyle.make_label("GODOT 4 · LOCAL SAVE · PROCEDURAL ART AND AUDIO · NO ONLINE SERVICES",
+	var footer := UIStyle.make_label(Loc.t("GODOT 4 · LOCAL SAVE · PROCEDURAL ART AND AUDIO · NO ONLINE SERVICES"),
 		9, Color(0.5, 0.5, 0.46))
 	footer.position = Vector2(96, 848)
 	add_child(footer)
@@ -100,10 +100,10 @@ func _build() -> void:
 	add_child(_help)
 
 	_new_campaign_dialog = ConfirmationDialog.new()
-	_new_campaign_dialog.title = "New campaign"
-	_new_campaign_dialog.dialog_text = "Start a new campaign and reset all unlocks, stars and totals?"
-	_new_campaign_dialog.ok_button_text = "START NEW"
-	_new_campaign_dialog.cancel_button_text = "CANCEL"
+	_new_campaign_dialog.title = Loc.t("New campaign")
+	_new_campaign_dialog.dialog_text = Loc.t("Start a new campaign and reset all unlocks, stars and totals?")
+	_new_campaign_dialog.ok_button_text = Loc.t("START NEW")
+	_new_campaign_dialog.cancel_button_text = Loc.t("CANCEL")
 	_new_campaign_dialog.confirmed.connect(_on_new_campaign_confirmed)
 	add_child(_new_campaign_dialog)
 
@@ -134,10 +134,10 @@ func _refresh_status() -> void:
 	if _status_label == null:
 		return
 	if GameState.campaign_started:
-		_status_label.text = "Highest unlocked sector: %02d — %s" % [
-			GameState.unlocked_level, GameState.level_title(GameState.unlocked_level - 1)]
+		_status_label.text = Loc.tf("Highest unlocked sector: %02d — %s", [
+			GameState.unlocked_level, GameState.level_title(GameState.unlocked_level - 1)])
 	else:
-		_status_label.text = "No campaign started. The brood is waiting."
+		_status_label.text = Loc.t("No campaign started. The brood is waiting.")
 
 
 func _on_continue() -> void:

@@ -217,6 +217,7 @@ func _test_level_one() -> void:
 	level.select_build_type("pulse")
 	level.try_place_tower(buildable)
 	level.set_game_speed(3)
+	GameState.clear_wave_checkpoint()
 	var wave_ok: bool = level.request_next_wave()
 	check(wave_ok, "First wave can be started")
 	var frames := 0
@@ -229,6 +230,26 @@ func _test_level_one() -> void:
 	check(level.waves.finished_waves >= 1, "First wave completes after all spawns are cleared")
 	check(int(level.stats.kills) > 0, "Killing enemies records kill statistics")
 	check(level.waves.has_active_wave() == false, "No stale active wave remains after completion")
+
+	# The checkpoint must describe the moment the wave was cleared, not the
+	# moment the next wave is called.
+	check(GameState.has_wave_checkpoint(), "Clearing a wave stores a checkpoint")
+	check(int(GameState.wave_checkpoint.get("waves_cleared", -1)) == level.waves.finished_waves,
+		"Checkpoint records the cleared wave")
+	var saved_credits := int(level.economy.credits)
+	check(int(GameState.wave_checkpoint.get("credits", -1)) == saved_credits,
+		"Checkpoint stores the credits left when the wave ended")
+	var saved_towers: Array = GameState.wave_checkpoint.get("towers", [])
+	check(saved_towers.size() == level.grid.occupied.size(),
+		"Checkpoint stores every tower standing when the wave ended")
+	level.economy.spend(50)
+	level.request_next_wave()
+	check(int(GameState.wave_checkpoint.get("credits", -1)) == saved_credits,
+		"Starting the next wave does not overwrite the checkpoint credits")
+	var towers_after: Array = GameState.wave_checkpoint.get("towers", [])
+	check(towers_after.size() == saved_towers.size(),
+		"Starting the next wave does not overwrite the checkpoint towers")
+	GameState.clear_wave_checkpoint()
 
 	level.set_game_speed(1)
 	level.queue_free()

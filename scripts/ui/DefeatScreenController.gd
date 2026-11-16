@@ -40,12 +40,12 @@ func _build() -> void:
 	margin.add_child(box)
 
 	var stats: Dictionary = _result.get("stats", {})
-	box.add_child(UIStyle.make_label("BASE INTEGRITY LOST", 13, UIStyle.RED, HORIZONTAL_ALIGNMENT_CENTER))
-	box.add_child(UIStyle.make_label("OUTPOST OVERRUN", 34, UIStyle.RED, HORIZONTAL_ALIGNMENT_CENTER))
-	box.add_child(UIStyle.make_label("%s  ·  SECTOR %02d" % [
-		String(stats.get("level_name", "Sector")), int(stats.get("level_number", 1))],
+	box.add_child(UIStyle.make_label(Loc.t("BASE INTEGRITY LOST"), 13, UIStyle.RED, HORIZONTAL_ALIGNMENT_CENTER))
+	box.add_child(UIStyle.make_label(Loc.t("OUTPOST OVERRUN"), 34, UIStyle.RED, HORIZONTAL_ALIGNMENT_CENTER))
+	box.add_child(UIStyle.make_label(Loc.tf("%s  ·  SECTOR %02d", [
+		Loc.t(String(stats.get("level_name", Loc.t("Sector")))), int(stats.get("level_number", 1))]),
 		12, UIStyle.MUTED, HORIZONTAL_ALIGNMENT_CENTER))
-	box.add_child(UIStyle.make_label("The brood reached the First Bastion. Rebuild the defence and try again.",
+	box.add_child(UIStyle.make_label(Loc.t("The base falls the moment a single arachnid gets through. Rebuild and hold every road."),
 		12, UIStyle.OFFWHITE, HORIZONTAL_ALIGNMENT_CENTER))
 	box.add_child(UIStyle.separator(true))
 
@@ -54,20 +54,39 @@ func _build() -> void:
 	grid.add_theme_constant_override("h_separation", 16)
 	grid.add_theme_constant_override("v_separation", 4)
 	box.add_child(grid)
-	_add_stat(grid, "Waves cleared", str(int(stats.get("waves_cleared", 0))))
-	_add_stat(grid, "Leaks", str(int(stats.get("leaks", 0))))
-	_add_stat(grid, "Arachnids killed", str(int(stats.get("kills", 0))))
-	_add_stat(grid, "Towers built", str(int(stats.get("towers_built", 0))))
-	_add_stat(grid, "Credits earned", "$%d" % int(stats.get("credits_earned", 0)))
-	_add_stat(grid, "Battle time", _format_time(float(stats.get("time", 0.0))))
+	_add_stat(grid, Loc.t("Waves cleared"), str(int(stats.get("waves_cleared", 0))))
+	_add_stat(grid, Loc.t("Leaks"), str(int(stats.get("leaks", 0))))
+	_add_stat(grid, Loc.t("Arachnids killed"), str(int(stats.get("kills", 0))))
+	_add_stat(grid, Loc.t("Towers built"), str(int(stats.get("towers_built", 0))))
+	_add_stat(grid, Loc.t("Credits earned"), "$%d" % int(stats.get("credits_earned", 0)))
+	_add_stat(grid, Loc.t("Battle time"), _format_time(float(stats.get("time", 0.0))))
 	box.add_child(UIStyle.separator(true))
 
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	box.add_child(row)
-	_add_button(row, "RETRY SECTOR", true, _on_retry)
-	_add_button(row, "SECTOR SELECT", false, _on_level_select)
-	_add_button(row, "MAIN MENU", false, _on_menu)
+	var cleared := _checkpoint_wave()
+	if cleared > 0:
+		box.add_child(UIStyle.make_label(Loc.tf(
+			"Checkpoint: wave %d cleared — all towers and credits will be restored.",
+			[cleared]), 11, UIStyle.AMBER, HORIZONTAL_ALIGNMENT_CENTER))
+
+	if cleared > 0:
+		var wave_row := HBoxContainer.new()
+		wave_row.add_theme_constant_override("separation", 8)
+		box.add_child(wave_row)
+		_add_button(wave_row, Loc.tf("RETRY FROM WAVE %d", [cleared + 1]), true, _on_retry_wave)
+		_add_button(wave_row, Loc.t("RETRY SECTOR"), false, _on_retry)
+
+		var nav_row := HBoxContainer.new()
+		nav_row.add_theme_constant_override("separation", 8)
+		box.add_child(nav_row)
+		_add_button(nav_row, Loc.t("SECTOR SELECT"), false, _on_level_select)
+		_add_button(nav_row, Loc.t("MAIN MENU"), false, _on_menu)
+	else:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		box.add_child(row)
+		_add_button(row, Loc.t("RETRY SECTOR"), true, _on_retry)
+		_add_button(row, Loc.t("SECTOR SELECT"), false, _on_level_select)
+		_add_button(row, Loc.t("MAIN MENU"), false, _on_menu)
 	AudioManager.play_sound("defeat", 0.75, 1.0)
 
 
@@ -94,6 +113,23 @@ func _add_button(parent: HBoxContainer, text: String, accent: bool, handler: Cal
 func _format_time(seconds: float) -> String:
 	var total := int(seconds)
 	return "%d:%02d" % [total / 60, total % 60]
+
+
+func _checkpoint_wave() -> int:
+	## Waves already cleared in the stored checkpoint for this sector, or 0 when
+	## the player fell before completing a single wave.
+	var snapshot: Dictionary = GameState.wave_checkpoint
+	if snapshot.is_empty():
+		return 0
+	if int(snapshot.get("level_index", -1)) != int(GameState.current_level_index):
+		return 0
+	return maxi(0, int(snapshot.get("waves_cleared", 0)))
+
+
+func _on_retry_wave() -> void:
+	get_tree().paused = false
+	if not GameState.resume_wave_checkpoint():
+		GameState.restart_level()
 
 
 func _on_retry() -> void:

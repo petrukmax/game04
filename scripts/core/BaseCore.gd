@@ -67,7 +67,7 @@ func _draw() -> void:
 		var segment_color := Color(0.45, 0.95, 0.45) if float(i) / 10.0 < ratio else Color(0.35, 0.1, 0.08)
 		draw_rect(Rect2(-56 + i * 11.5, 58, 8, 5), segment_color)
 	var font := ThemeDB.fallback_font
-	draw_string(font, Vector2(-80, 78), "FIRST BASTION", HORIZONTAL_ALIGNMENT_CENTER, 160, 11,
+	draw_string(font, Vector2(-80, 78), Loc.t("FIRST BASTION"), HORIZONTAL_ALIGNMENT_CENTER, 160, 11,
 		Color(0.95, 0.82, 0.55, 0.85))
 	if _flash > 0.0:
 		draw_circle(Vector2.ZERO, 64.0, Color(1.0, 0.15, 0.1, _flash * 0.3))

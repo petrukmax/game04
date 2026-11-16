@@ -278,7 +278,7 @@ func _update_boss(step: float) -> void:
 			boss_phase = 1
 			elite_burst_timer = 4.0
 			speed_mult = 1.0
-			EventBus.boss_phase.emit("Elite frenzy — it is charging!")
+			EventBus.boss_phase.emit(Loc.t("Elite frenzy — it is charging!"))
 			AudioManager.play_sound("boss_roar", 0.55, 1.1)
 
 
@@ -326,8 +326,8 @@ func _check_boss_phase() -> void:
 	var ratio := health / maxf(1.0, max_health)
 	if boss_phase == 0 and ratio <= 0.72:
 		boss_phase = 1
-		EventBus.boss_phase.emit("Brood Tyrant: Hatchlings! It calls the brood.")
-		EventBus.notification.emit("The Brood Tyrant summons its brood!", GameConfig.WARNING_RED)
+		EventBus.boss_phase.emit(Loc.t("Brood Tyrant: Hatchlings! It calls the brood."))
+		EventBus.notification.emit(Loc.t("The Brood Tyrant summons its brood!"), GameConfig.WARNING_RED)
 		AudioManager.play_sound("boss_roar", 0.7, 0.9)
 		level.call("summon_reinforcements", path_id, "worker", 6, 140.0)
 	elif boss_phase == 1 and ratio <= 0.45:
@@ -335,14 +335,14 @@ func _check_boss_phase() -> void:
 		shield_current += 450.0
 		max_shield = maxf(max_shield, shield_current)
 		speed_mult = 1.15
-		EventBus.boss_phase.emit("Brood Tyrant: Carapace Surge! Shields online.")
-		EventBus.notification.emit("The Brood Tyrant hardens its carapace!", GameConfig.WARNING_RED)
+		EventBus.boss_phase.emit(Loc.t("Brood Tyrant: Carapace Surge! Shields online."))
+		EventBus.notification.emit(Loc.t("The Brood Tyrant hardens its carapace!"), GameConfig.WARNING_RED)
 		AudioManager.play_sound("shield_break", 0.7, 0.7)
 	elif boss_phase == 2 and ratio <= 0.2:
 		boss_phase = 3
 		speed_mult = 1.45
-		EventBus.boss_phase.emit("Brood Tyrant: FINAL FURY — it is enraged!")
-		EventBus.notification.emit("The Brood Tyrant is enraged. Finish it!", GameConfig.WARNING_RED)
+		EventBus.boss_phase.emit(Loc.t("Brood Tyrant: FINAL FURY — it is enraged!"))
+		EventBus.notification.emit(Loc.t("The Brood Tyrant is enraged. Finish it!"), GameConfig.WARNING_RED)
 		AudioManager.play_sound("boss_roar", 0.85, 0.75)
 
 
@@ -420,7 +420,7 @@ func _die(source: Node) -> void:
 	if level != null:
 		level.call("spawn_fx_at", "death", global_position, enemy_data.body_color, 40.0 if not enemy_data.is_boss else 110.0)
 		if enemy_data.is_boss:
-			EventBus.notification.emit("The Brood Tyrant has fallen!", GameConfig.AMBER)
+			EventBus.notification.emit(Loc.t("The Brood Tyrant has fallen!"), GameConfig.AMBER)
 			AudioManager.play_sound("victory", 0.7, 1.0)
 		level.call("handle_enemy_removed", self, false)
 	queue_free()

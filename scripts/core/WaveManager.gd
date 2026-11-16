@@ -66,9 +66,10 @@ func start_next_wave() -> bool:
 		early_calls += 1
 		var bonus := 20 + 5 * started_waves
 		level.economy.add_credits(bonus, "early call")
-		EventBus.notification.emit("Early call: +%d credits" % bonus, GameConfig.AMBER)
-	EventBus.wave_started.emit(started_waves, total_waves, wave.preview)
-	EventBus.notification.emit("Wave %d incoming — %s" % [started_waves, wave.preview], GameConfig.OFFWHITE)
+		EventBus.notification.emit(Loc.tf("Early call: +%d credits", [bonus]), GameConfig.AMBER)
+	var preview := preview_for(wave)
+	EventBus.wave_started.emit(started_waves, total_waves, preview)
+	EventBus.notification.emit(Loc.tf("Wave %d incoming — %s", [started_waves, preview]), GameConfig.OFFWHITE)
 	if level.has_method("on_wave_started"):
 		level.on_wave_started(started_waves, total_waves, wave)
 	return true
@@ -86,7 +87,7 @@ func _check_completion() -> void:
 				finished_waves += 1
 				EventBus.wave_completed.emit(finished_waves, wave.completion_bonus)
 		level.economy.add_credits(total_bonus, "wave")
-		EventBus.notification.emit("Wave cleared. +%d credits" % total_bonus, GameConfig.AMBER)
+		EventBus.notification.emit(Loc.tf("Wave cleared. +%d credits", [total_bonus]), GameConfig.AMBER)
 		if level.has_method("on_wave_cleared"):
 			level.on_wave_cleared(finished_waves, total_bonus)
 		if finished_waves >= total_waves:
@@ -119,11 +120,22 @@ func current_number() -> int:
 
 
 func progress_text() -> String:
-	return "Wave %d / %d" % [current_number(), total_waves]
+	return Loc.tf("Wave %d / %d", [current_number(), total_waves])
 
 
 func next_preview() -> String:
 	var wave := next_wave_data()
 	if wave == null:
-		return "Final wave in progress"
-	return wave.preview
+		return Loc.t("Final wave in progress")
+	return preview_for(wave)
+
+
+func preview_for(wave: WaveData) -> String:
+	if wave == null:
+		return ""
+	var parts: Array[String] = []
+	for entry in wave.entries:
+		if entry == null:
+			continue
+		parts.append("%s ×%d" % [Loc.enemy_name(String(entry.enemy_id)), int(entry.count)])
+	return " · ".join(parts)

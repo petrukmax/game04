@@ -48,6 +48,14 @@ var settings: Dictionary = {}
 var current_level_index: int = 0
 var last_result: Dictionary = {}
 var selected_level_for_briefing: int = 0
+## Snapshot of the run at the end of the last cleared wave (towers, credits,
+## statistics). It lives only in memory: the defeat screen uses it to offer a
+## retry that skips the waves the player already survived.
+var wave_checkpoint: Dictionary = {}
+## One-shot flag: set only when the player explicitly retries from a checkpoint.
+## LevelBase consumes it in _ready, so a normal fresh level never restores old
+## state (for example after restarting a sector or entering another one).
+var wave_checkpoint_pending: bool = false
 
 
 func _ready() -> void:
@@ -66,7 +74,12 @@ func load_from_disk() -> void:
 	campaign_started = GameConfig.as_bool(payload.get("campaign_started", false))
 	settings = payload.get("settings", {}).duplicate(true)
 	if SaveManager.last_error != "":
-		EventBus.notification.emit(SaveManager.last_error, GameConfig.WARNING_RED)
+		# Loc is registered after GameState, so during the very first boot the
+		# autoload may not exist yet. Fall back to the raw message in that case.
+		var message := SaveManager.last_error
+		if has_node("/root/Loc"):
+			message = get_node("/root/Loc").call("t", message)
+		EventBus.notification.emit(message, GameConfig.WARNING_RED)
 
 
 func save_to_disk() -> void:
@@ -106,6 +119,7 @@ func start_level(index: int) -> void:
 		return
 	current_level_index = index
 	last_result = {}
+	clear_wave_checkpoint()
 	campaign_started = true
 	get_tree().paused = false
 	Engine.time_scale = 1.0
@@ -116,15 +130,50 @@ func start_level(index: int) -> void:
 
 func restart_level() -> void:
 	last_result = {}
+	clear_wave_checkpoint()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
 	get_tree().reload_current_scene()
+
+
+## Stores a snapshot of the run at the end of a cleared wave. The player can
+## return to it from the defeat screen without losing the whole sector.
+func store_wave_checkpoint(snapshot: Dictionary) -> void:
+	wave_checkpoint = snapshot.duplicate(true)
+	wave_checkpoint_pending = false
+
+
+func has_wave_checkpoint() -> bool:
+	return not wave_checkpoint.is_empty()
+
+
+func clear_wave_checkpoint() -> void:
+	wave_checkpoint.clear()
+	wave_checkpoint_pending = false
+
+
+## Reloads the active sector level; LevelBase restores the stored snapshot in
+## _ready. Returns false when there is nothing to restore for this sector.
+func resume_wave_checkpoint() -> bool:
+	if wave_checkpoint.is_empty():
+		return false
+	if int(wave_checkpoint.get("level_index", -1)) != current_level_index:
+		return false
+	wave_checkpoint_pending = true
+	last_result = {}
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	if has_node("/root/AudioManager"):
+		get_node("/root/AudioManager").stop_all_sfx()
+	get_tree().reload_current_scene()
+	return true
 
 
 func goto_main_menu() -> void:
 	get_tree().paused = false
 	Engine.time_scale = 1.0
 	last_result = {}
+	clear_wave_checkpoint()
 	if has_node("/root/AudioManager"):
 		get_node("/root/AudioManager").stop_all_sfx()
 	get_tree().change_scene_to_file("res://scenes/main/MainMenu.tscn")
@@ -134,6 +183,7 @@ func goto_level_select() -> void:
 	get_tree().paused = false
 	Engine.time_scale = 1.0
 	last_result = {}
+	clear_wave_checkpoint()
 	if has_node("/root/AudioManager"):
 		get_node("/root/AudioManager").stop_all_sfx()
 	get_tree().change_scene_to_file("res://scenes/main/LevelSelect.tscn")
@@ -167,6 +217,7 @@ func complete_level(stars: int, stats: Dictionary) -> Dictionary:
 		"unlocked_next": unlocked_next,
 		"campaign_complete": number == 15,
 	}
+	clear_wave_checkpoint()
 	save_to_disk()
 	EventBus.level_completed.emit(stars)
 	return last_result
@@ -220,13 +271,14 @@ func reset_campaign() -> void:
 	total_levels = 0
 	campaign_started = false
 	last_result = {}
+	clear_wave_checkpoint()
 	save_to_disk()
 
 
 func level_title(index: int) -> String:
 	if index < 0 or index >= LEVEL_DATA_PATHS.size():
-		return "Unknown Sector"
+		return Loc.t("Unknown Sector")
 	var res := load(LEVEL_DATA_PATHS[index])
 	if res is LevelData:
-		return res.display_name
-	return "Sector %d" % (index + 1)
+		return Loc.t(res.display_name)
+	return Loc.tf("Sector %d", [index + 1])

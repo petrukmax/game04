@@ -163,6 +163,23 @@ different project.
   `Opencode` parent), use git/GitHub Desktop (browser upload rejects the 39.5 MB wasm),
   never Git LFS, public repo on the free plan, open the URL with a trailing slash.
 
+## Block D10 — HUD top bar readability [x]
+- [x] Enlarged the next-wave composition preview from 10 px to 17 px — the same size as the
+  sector name — without changing its `OFFWHITE` colour.
+- [x] Removed the fixed 220 / 110 / 96 px minimum widths on the identity, credits and wave
+  columns and cut the top-bar row separation from 10 to 6, so credits, wave and preview sit
+  next to each other with no dead gaps.
+- [x] Centred the top-bar columns vertically, kept the bar compact (68 px tall) and moved the
+  notification stack down by 6 px to match.
+- [x] Verified the longest preview in the game (sector 15, final wave) fits without clipping at
+  1600×900 and 1280×720 (`tests/screenshots_1600x900/05_level_idle.png`).
+- [x] `TestRunner`: 664 checks, 0 failures.
+- [x] Re-exported the Web build and smoke-tested it in headless Chrome: the menu boots and the
+  in-game top bar shows the new spacing and preview size (`tests/web_build_1600x900.png`,
+  `tests/web_hud_topbar.png`; only the known MSAA warning).
+- [x] Added `AGENTS.md` with the standing rule: **always re-export the Web build after any
+  project change**.
+
 ## Verification commands
 
 ```bash

@@ -41,11 +41,11 @@ func _build() -> void:
 
 	var stats: Dictionary = _result.get("stats", {})
 	var campaign_complete := GameConfig.as_bool(_result.get("campaign_complete", false))
-	box.add_child(UIStyle.make_label("SECTOR SECURED", 13, UIStyle.GREEN, HORIZONTAL_ALIGNMENT_CENTER))
-	box.add_child(UIStyle.make_label("CAMPAIGN COMPLETE" if campaign_complete else "VICTORY",
+	box.add_child(UIStyle.make_label(Loc.t("SECTOR SECURED"), 13, UIStyle.GREEN, HORIZONTAL_ALIGNMENT_CENTER))
+	box.add_child(UIStyle.make_label(Loc.t("CAMPAIGN COMPLETE") if campaign_complete else Loc.t("VICTORY"),
 		38, UIStyle.AMBER, HORIZONTAL_ALIGNMENT_CENTER))
-	box.add_child(UIStyle.make_label("%s  ·  SECTOR %02d" % [
-		String(stats.get("level_name", "Sector")), int(stats.get("level_number", 1))],
+	box.add_child(UIStyle.make_label(Loc.tf("%s  ·  SECTOR %02d", [
+		Loc.t(String(stats.get("level_name", Loc.t("Sector")))), int(stats.get("level_number", 1))]),
 		12, UIStyle.MUTED, HORIZONTAL_ALIGNMENT_CENTER))
 
 	var stars := int(_result.get("stars", 1))
@@ -65,31 +65,31 @@ func _build() -> void:
 	grid.add_theme_constant_override("h_separation", 16)
 	grid.add_theme_constant_override("v_separation", 4)
 	box.add_child(grid)
-	_add_stat(grid, "Base integrity", "%d / %d" % [int(stats.get("base_health", 0)), int(stats.get("base_max", 1))])
-	_add_stat(grid, "Arachnids killed", str(int(stats.get("kills", 0))))
-	_add_stat(grid, "Leaks", str(int(stats.get("leaks", 0))))
-	_add_stat(grid, "Waves cleared", str(int(stats.get("waves_cleared", 0))))
-	_add_stat(grid, "Towers built", str(int(stats.get("towers_built", 0))))
-	_add_stat(grid, "Credits earned", "$%d" % int(stats.get("credits_earned", 0)))
-	_add_stat(grid, "Battle time", _format_time(float(stats.get("time", 0.0))))
-	_add_stat(grid, "Next sector", "UNLOCKED" if GameConfig.as_bool(_result.get("unlocked_next", false)) else "—")
+	_add_stat(grid, Loc.t("Base integrity"), "%d / %d" % [int(stats.get("base_health", 0)), int(stats.get("base_max", 1))])
+	_add_stat(grid, Loc.t("Arachnids killed"), str(int(stats.get("kills", 0))))
+	_add_stat(grid, Loc.t("Leaks"), str(int(stats.get("leaks", 0))))
+	_add_stat(grid, Loc.t("Waves cleared"), str(int(stats.get("waves_cleared", 0))))
+	_add_stat(grid, Loc.t("Towers built"), str(int(stats.get("towers_built", 0))))
+	_add_stat(grid, Loc.t("Credits earned"), "$%d" % int(stats.get("credits_earned", 0)))
+	_add_stat(grid, Loc.t("Battle time"), _format_time(float(stats.get("time", 0.0))))
+	_add_stat(grid, Loc.t("Next sector"), Loc.t("UNLOCKED") if GameConfig.as_bool(_result.get("unlocked_next", false)) else "—")
 	box.add_child(UIStyle.separator(true))
 
 	if campaign_complete:
-		box.add_child(UIStyle.make_label("The First Bastion stands. The brood is broken — for now.",
+		box.add_child(UIStyle.make_label(Loc.t("The First Bastion stands. The brood is broken — for now."),
 			12, UIStyle.OFFWHITE, HORIZONTAL_ALIGNMENT_CENTER))
 	elif GameConfig.as_bool(_result.get("unlocked_next", false)):
-		box.add_child(UIStyle.make_label("Sector %02d is now available." % (int(_result.get("level_number", 1)) + 1),
+		box.add_child(UIStyle.make_label(Loc.tf("Sector %02d is now available.", [int(_result.get("level_number", 1)) + 1]),
 			12, UIStyle.GREEN, HORIZONTAL_ALIGNMENT_CENTER))
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	box.add_child(row)
 	if GameConfig.as_bool(_result.get("unlocked_next", false)) and not campaign_complete:
-		_add_button(row, "NEXT SECTOR", true, _on_next)
-	_add_button(row, "REPLAY", false, _on_replay)
-	_add_button(row, "SECTOR SELECT", false, _on_level_select)
-	_add_button(row, "MAIN MENU", false, _on_menu)
+		_add_button(row, Loc.t("NEXT SECTOR"), true, _on_next)
+	_add_button(row, Loc.t("REPLAY"), false, _on_replay)
+	_add_button(row, Loc.t("SECTOR SELECT"), false, _on_level_select)
+	_add_button(row, Loc.t("MAIN MENU"), false, _on_menu)
 	AudioManager.play_sound("victory", 0.8, 1.0)
 
 

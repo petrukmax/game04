@@ -25,6 +25,7 @@ func _default_payload() -> Dictionary:
 			"screen_shake": true,
 			"colorblind": false,
 			"speed": 1,
+			"language": "ru",
 		},
 	}
 
@@ -108,6 +109,10 @@ func _validate(data: Dictionary) -> Dictionary:
 		s["screen_shake"] = GameConfig.as_bool(raw_settings.get("screen_shake", true))
 		s["colorblind"] = GameConfig.as_bool(raw_settings.get("colorblind", false))
 		s["speed"] = clampi(int(raw_settings.get("speed", 1)), 1, 3)
+		var language := String(raw_settings.get("language", "ru"))
+		if language != "ru" and language != "en":
+			language = "ru"
+		s["language"] = language
 		out["settings"] = s
 	return out
 

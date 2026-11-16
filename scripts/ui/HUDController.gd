@@ -10,7 +10,6 @@ var tooltip: Control
 
 var _root: Control
 var _credits_label: Label
-var _integrity_label: Label
 var _wave_label: Label
 var _preview_label: Label
 var _speed_buttons: Array[Button] = []
@@ -49,58 +48,53 @@ func _build() -> void:
 func _build_top_bar() -> void:
 	var top := PanelContainer.new()
 	top.name = "TopBar"
-	top.add_theme_stylebox_override("panel", UIStyle.panel_box(UIStyle.BG_DEEP, Color(0.42, 0.32, 0.17), 1, 2))
+	var top_style := UIStyle.panel_box(UIStyle.BG_DEEP, Color(0.42, 0.32, 0.17), 1, 2)
+	top_style.content_margin_left = 4
+	top_style.content_margin_right = 4
+	top_style.content_margin_top = 2
+	top_style.content_margin_bottom = 2
+	top.add_theme_stylebox_override("panel", top_style)
 	top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	top.offset_left = 10
-	top.offset_right = -10
-	top.offset_top = 8
-	top.offset_bottom = 72
+	top.offset_left = 8
+	top.offset_right = -8
+	top.offset_top = 6
+	top.offset_bottom = 74
 	_root.add_child(top)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_right", 12)
-	margin.add_theme_constant_override("margin_top", 5)
-	margin.add_theme_constant_override("margin_bottom", 5)
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_top", 1)
+	margin.add_theme_constant_override("margin_bottom", 1)
 	top.add_child(margin)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 14)
+	row.add_theme_constant_override("separation", 6)
 	margin.add_child(row)
 
 	var identity := VBoxContainer.new()
 	identity.add_theme_constant_override("separation", 0)
-	identity.custom_minimum_size = Vector2(238, 0)
+	identity.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(identity)
-	identity.add_child(UIStyle.make_label("MARS ARACHNID DEFENSE", 9, UIStyle.MUTED))
-	identity.add_child(UIStyle.make_label(level.level_data.display_name.to_upper(), 18, UIStyle.AMBER))
-	identity.add_child(UIStyle.make_label("SECTOR %02d · %s" % [level.level_data.level_number, level.level_data.difficulty.to_upper()],
-		9, UIStyle.MUTED))
+	identity.add_child(UIStyle.make_label(Loc.t("MARS ARACHNID DEFENSE"), 8, UIStyle.MUTED))
+	identity.add_child(UIStyle.make_label(_sector_title(), 17, UIStyle.AMBER))
 
 	row.add_child(UIStyle.separator(false))
 
 	var credits_box := VBoxContainer.new()
 	credits_box.add_theme_constant_override("separation", 0)
-	credits_box.custom_minimum_size = Vector2(120, 0)
+	credits_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(credits_box)
-	credits_box.add_child(UIStyle.make_label("CREDITS", 9, UIStyle.MUTED))
-	_credits_label = UIStyle.make_label("0", 22, UIStyle.AMBER)
+	credits_box.add_child(UIStyle.make_label(Loc.t("CREDITS"), 8, UIStyle.MUTED))
+	_credits_label = UIStyle.make_label("0", 18, UIStyle.AMBER)
 	credits_box.add_child(_credits_label)
-
-	var integrity_box := VBoxContainer.new()
-	integrity_box.add_theme_constant_override("separation", 0)
-	integrity_box.custom_minimum_size = Vector2(130, 0)
-	row.add_child(integrity_box)
-	integrity_box.add_child(UIStyle.make_label("BASE INTEGRITY", 9, UIStyle.MUTED))
-	_integrity_label = UIStyle.make_label("100 / 100", 22, UIStyle.GREEN)
-	integrity_box.add_child(_integrity_label)
 
 	var wave_box := VBoxContainer.new()
 	wave_box.add_theme_constant_override("separation", 0)
-	wave_box.custom_minimum_size = Vector2(108, 0)
+	wave_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(wave_box)
-	wave_box.add_child(UIStyle.make_label("WAVE", 9, UIStyle.MUTED))
-	_wave_label = UIStyle.make_label("0 / 0", 20, UIStyle.OFFWHITE)
+	wave_box.add_child(UIStyle.make_label(Loc.t("WAVE"), 8, UIStyle.MUTED))
+	_wave_label = UIStyle.make_label("0 / 0", 16, UIStyle.OFFWHITE)
 	wave_box.add_child(_wave_label)
 
 	row.add_child(UIStyle.separator(false))
@@ -108,31 +102,32 @@ func _build_top_bar() -> void:
 	var preview_box := VBoxContainer.new()
 	preview_box.add_theme_constant_override("separation", 0)
 	preview_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	preview_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(preview_box)
-	preview_box.add_child(UIStyle.make_label("NEXT WAVE — SPACE TO CALL EARLY", 9, UIStyle.MUTED))
-	_preview_label = UIStyle.make_label("Preparing first contact", 11, UIStyle.OFFWHITE)
+	preview_box.add_child(UIStyle.make_label(Loc.t("NEXT WAVE — SPACE TO CALL EARLY"), 8, UIStyle.MUTED))
+	_preview_label = UIStyle.make_label(Loc.t("Preparing first contact"), 17, UIStyle.OFFWHITE)
 	_preview_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_preview_label.custom_minimum_size = Vector2(0, 32)
+	_preview_label.max_lines_visible = 2
 	preview_box.add_child(_preview_label)
 
-	var send := UIStyle.make_button("SEND WAVE", true, true)
+	var send := UIStyle.make_button(Loc.t("SEND WAVE"), true, true)
 	send.name = "SendWaveButton"
-	send.custom_minimum_size = Vector2(118, 40)
-	send.tooltip_text = "Call the next wave early for a credit bonus (Space)."
+	send.custom_minimum_size = Vector2(112, 34)
+	send.tooltip_text = Loc.t("Call the next wave early for a credit bonus (Space).")
 	send.pressed.connect(_on_send_pressed)
 	row.add_child(send)
 
 	for speed in [1, 2, 3]:
 		var button := UIStyle.make_button("%dx" % speed, false, true)
-		button.custom_minimum_size = Vector2(38, 40)
-		button.tooltip_text = "Set simulation speed to %dx (F%d)." % [speed, speed]
+		button.custom_minimum_size = Vector2(34, 34)
+		button.tooltip_text = Loc.tf("Set simulation speed to %dx (F%d).", [speed, speed])
 		button.pressed.connect(_on_speed_pressed.bind(speed))
 		row.add_child(button)
 		_speed_buttons.append(button)
 
 	var pause := UIStyle.make_button("II", false, true)
-	pause.custom_minimum_size = Vector2(42, 40)
-	pause.tooltip_text = "Pause simulation (Esc)."
+	pause.custom_minimum_size = Vector2(36, 34)
+	pause.tooltip_text = Loc.t("Pause simulation (Esc).")
 	pause.pressed.connect(_on_pause_pressed)
 	row.add_child(pause)
 
@@ -143,7 +138,7 @@ func _build_notifications() -> void:
 	_notification_box.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_notification_box.offset_left = 330
 	_notification_box.offset_right = -330
-	_notification_box.offset_top = 82
+	_notification_box.offset_top = 88
 	_notification_box.offset_bottom = 286
 	_notification_box.alignment = BoxContainer.ALIGNMENT_BEGIN
 	_notification_box.add_theme_constant_override("separation", 3)
@@ -160,31 +155,38 @@ func _build_wave_banner() -> void:
 func _build_bottom_bar() -> void:
 	var bottom := PanelContainer.new()
 	bottom.name = "BottomBar"
-	bottom.add_theme_stylebox_override("panel", UIStyle.panel_box(UIStyle.BG_DEEP, Color(0.42, 0.32, 0.17), 1, 2))
+	var bottom_style := UIStyle.panel_box(UIStyle.BG_DEEP, Color(0.42, 0.32, 0.17), 1, 2)
+	bottom_style.content_margin_left = 4
+	bottom_style.content_margin_right = 4
+	bottom_style.content_margin_top = 2
+	bottom_style.content_margin_bottom = 2
+	bottom.add_theme_stylebox_override("panel", bottom_style)
 	bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	bottom.offset_left = 10
-	bottom.offset_right = -10
-	bottom.offset_top = -128
+	bottom.offset_left = 8
+	bottom.offset_right = -8
+	bottom.offset_top = -114
 	bottom.offset_bottom = -8
 	_root.add_child(bottom)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 8)
-	margin.add_theme_constant_override("margin_right", 8)
-	margin.add_theme_constant_override("margin_top", 5)
-	margin.add_theme_constant_override("margin_bottom", 5)
+	margin.add_theme_constant_override("margin_left", 2)
+	margin.add_theme_constant_override("margin_right", 2)
+	margin.add_theme_constant_override("margin_top", 1)
+	margin.add_theme_constant_override("margin_bottom", 1)
 	bottom.add_child(margin)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
+	row.add_theme_constant_override("separation", 4)
 	margin.add_child(row)
 
-	ability_bar = load("res://scenes/ui/AbilityBar.tscn").instantiate()
-	ability_bar.custom_minimum_size = Vector2(430, 0)
-	row.add_child(ability_bar)
-	ability_bar.call("setup", self, level)
-
-	row.add_child(UIStyle.separator(false))
+	# Abilities are temporarily disabled by user request. The manager, data and
+	# scene are kept intact, so the bar can be restored by reinstating this block
+	# and the Q/W/E/R/T bindings in LevelBase.
+	# ability_bar = load("res://scenes/ui/AbilityBar.tscn").instantiate()
+	# ability_bar.custom_minimum_size = Vector2(430, 0)
+	# row.add_child(ability_bar)
+	# ability_bar.call("setup", self, level)
+	# row.add_child(UIStyle.separator(false))
 
 	tower_shop = load("res://scenes/ui/TowerShop.tscn").instantiate()
 	tower_shop.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -197,7 +199,7 @@ func _build_tower_panel() -> void:
 	tower_panel = load("res://scenes/ui/TowerPanel.tscn").instantiate()
 	tower_panel.name = "TowerPanel"
 	_root.add_child(tower_panel)
-	tower_panel.position = Vector2(1258, 348)
+	tower_panel.position = Vector2(1206, 300)
 	tower_panel.call("setup", level)
 
 
@@ -208,7 +210,6 @@ func _build_tooltip() -> void:
 
 func _connect_signals() -> void:
 	EventBus.credits_changed.connect(_on_credits_changed)
-	EventBus.base_health_changed.connect(_on_base_health_changed)
 	EventBus.wave_started.connect(_on_wave_started)
 	EventBus.wave_completed.connect(_on_wave_completed)
 	EventBus.speed_changed.connect(_on_speed_changed)
@@ -233,18 +234,18 @@ func _process(delta: float) -> void:
 		tower_panel.call("refresh")
 
 
+## Sector number leads the name, e.g. "С12-ШТОРМОВАЯ ЛИНИЯ", so the top bar does
+## not need a second "SECTOR 12 · VERY HARD" line any more. The "С" prefix marks
+## the number as a sector id (С1, С2, С3 ...).
+func _sector_title() -> String:
+	var data := level.level_data
+	return Loc.tf("С%d-%s", [data.level_number, Loc.t(data.display_name).to_upper()])
+
+
 func _refresh_header() -> void:
 	if level == null or level.economy == null:
 		return
 	_credits_label.text = "$%d" % level.economy.credits
-	_integrity_label.text = "%d / %d" % [level.base_health, level.base_max]
-	var ratio := float(level.base_health) / maxf(1.0, float(level.base_max))
-	if ratio > 0.6:
-		_integrity_label.add_theme_color_override("font_color", UIStyle.GREEN)
-	elif ratio > 0.3:
-		_integrity_label.add_theme_color_override("font_color", UIStyle.AMBER)
-	else:
-		_integrity_label.add_theme_color_override("font_color", UIStyle.RED)
 	if level.waves != null:
 		_wave_label.text = "%d / %d" % [level.waves.current_number(), level.waves.total_waves]
 		var preview := level.waves.next_preview()
@@ -277,15 +278,6 @@ func _on_credits_changed(credits: int) -> void:
 	_refresh_shop(credits)
 
 
-func _on_base_health_changed(current: int, maximum: int) -> void:
-	if _integrity_label == null:
-		return
-	_integrity_label.text = "%d / %d" % [current, maximum]
-	var ratio := float(current) / maxf(1.0, float(maximum))
-	_integrity_label.add_theme_color_override("font_color",
-		UIStyle.GREEN if ratio > 0.6 else (UIStyle.AMBER if ratio > 0.3 else UIStyle.RED))
-
-
 func _on_wave_started(index: int, total: int, preview: String) -> void:
 	_wave_label.text = "%d / %d" % [index, total]
 	_preview_label.text = preview
@@ -295,7 +287,7 @@ func _on_wave_started(index: int, total: int, preview: String) -> void:
 
 func _on_wave_completed(_index: int, bonus: int) -> void:
 	if wave_banner:
-		wave_banner.call("show_message", "WAVE CLEARED", "+%d CREDITS" % bonus, UIStyle.GREEN)
+		wave_banner.call("show_message", Loc.t("WAVE CLEARED"), Loc.tf("+%d CREDITS", [bonus]), UIStyle.GREEN)
 
 
 func _on_speed_changed(_speed: int) -> void:
@@ -343,12 +335,12 @@ func _on_notification(text: String, color: Color) -> void:
 
 func _on_boss_phase(text: String) -> void:
 	if wave_banner:
-		wave_banner.call("show_message", "BROOD TYRANT", text, UIStyle.RED)
+		wave_banner.call("show_message", Loc.t("BROOD TYRANT"), Loc.t(text), UIStyle.RED)
 
 
 func _on_tower_disabled(tower: Node, _duration: float) -> void:
 	if tower != null and is_instance_valid(tower):
-		EventBus.notification.emit("Tower disabled by corrosive acid!", Color(0.55, 1.0, 0.3))
+		EventBus.notification.emit(Loc.t("Tower disabled by corrosive acid!"), Color(0.55, 1.0, 0.3))
 
 
 func _on_send_pressed() -> void:

@@ -25,6 +25,7 @@ config/icon="res://assets/textures/icon.svg"
 EventBus="*res://scripts/autoload/EventBus.gd"
 SaveManager="*res://scripts/autoload/SaveManager.gd"
 GameState="*res://scripts/autoload/GameState.gd"
+Loc="*res://scripts/autoload/Loc.gd"
 AudioManager="*res://scripts/autoload/AudioManager.gd"
 
 [display]

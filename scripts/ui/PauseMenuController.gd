@@ -36,18 +36,18 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 7)
 	margin.add_child(box)
-	box.add_child(UIStyle.make_label("SIMULATION PAUSED", 24, UIStyle.AMBER, HORIZONTAL_ALIGNMENT_CENTER))
-	var hint := UIStyle.make_label("The battle waits for you. Esc or Resume continues.", 11, UIStyle.MUTED,
+	box.add_child(UIStyle.make_label(Loc.t("SIMULATION PAUSED"), 24, UIStyle.AMBER, HORIZONTAL_ALIGNMENT_CENTER))
+	var hint := UIStyle.make_label(Loc.t("The battle waits for you. Esc or Resume continues."), 11, UIStyle.MUTED,
 		HORIZONTAL_ALIGNMENT_CENTER)
 	box.add_child(hint)
 	box.add_child(UIStyle.separator(true))
 
-	_add_button(box, "RESUME", true, _on_resume)
-	_add_button(box, "RESTART SECTOR", false, _on_restart)
-	_add_button(box, "SETTINGS", false, _on_settings)
-	_add_button(box, "HELP / CONTROLS", false, _on_help)
-	_add_button(box, "SECTOR SELECT", false, _on_level_select)
-	_add_button(box, "MAIN MENU", false, _on_menu)
+	_add_button(box, Loc.t("RESUME"), true, _on_resume)
+	_add_button(box, Loc.t("RESTART SECTOR"), false, _on_restart)
+	_add_button(box, Loc.t("SETTINGS"), false, _on_settings)
+	_add_button(box, Loc.t("HELP / CONTROLS"), false, _on_help)
+	_add_button(box, Loc.t("SECTOR SELECT"), false, _on_level_select)
+	_add_button(box, Loc.t("MAIN MENU"), false, _on_menu)
 
 	settings_panel = load("res://scenes/ui/SettingsPanel.tscn").instantiate()
 	add_child(settings_panel)

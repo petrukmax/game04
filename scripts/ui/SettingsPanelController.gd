@@ -7,6 +7,7 @@ var _music: HSlider
 var _muted: CheckButton
 var _shake: CheckButton
 var _colorblind: CheckButton
+var _language: OptionButton
 var _master_value: Label
 var _sfx_value: Label
 var _music_value: Label
@@ -31,7 +32,7 @@ func _build() -> void:
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", UIStyle.panel_box(UIStyle.BG_PANEL, Color(0.55, 0.4, 0.2), 1, 4))
 	panel.custom_minimum_size = Vector2(520, 0)
-	panel.position = Vector2(540, 176)
+	panel.position = Vector2(540, 152)
 	add_child(panel)
 
 	var margin := MarginContainer.new()
@@ -43,36 +44,54 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	margin.add_child(box)
-	box.add_child(UIStyle.make_label("SETTINGS", 24, UIStyle.AMBER, HORIZONTAL_ALIGNMENT_CENTER))
-	var note := UIStyle.make_label("Audio is generated locally. Volumes apply immediately and are saved on change.",
+	box.add_child(UIStyle.make_label(Loc.t("SETTINGS"), 24, UIStyle.AMBER, HORIZONTAL_ALIGNMENT_CENTER))
+	var note := UIStyle.make_label(Loc.t("Audio is generated locally. Volumes apply immediately and are saved on change."),
 		10, UIStyle.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(note)
 	box.add_child(UIStyle.separator(true))
 
-	_master = _add_slider(box, "Master volume", "master_volume", "_master_value")
-	_sfx = _add_slider(box, "Effects volume", "sfx_volume", "_sfx_value")
-	_music = _add_slider(box, "Ambience volume", "music_volume", "_music_value")
+	_master = _add_slider(box, Loc.t("Master volume"), "master_volume", "_master_value")
+	_sfx = _add_slider(box, Loc.t("Effects volume"), "sfx_volume", "_sfx_value")
+	_music = _add_slider(box, Loc.t("Ambience volume"), "music_volume", "_music_value")
 
-	_muted = _add_check(box, "Mute all audio", "muted")
-	_shake = _add_check(box, "Screen shake", "screen_shake")
-	_colorblind = _add_check(box, "High-contrast status markers", "colorblind")
+	_muted = _add_check(box, Loc.t("Mute all audio"), "muted")
+	_shake = _add_check(box, Loc.t("Screen shake"), "screen_shake")
+	_colorblind = _add_check(box, Loc.t("High-contrast status markers"), "colorblind")
+
+	var language_row := HBoxContainer.new()
+	language_row.add_theme_constant_override("separation", 10)
+	box.add_child(language_row)
+	var language_label := UIStyle.make_label(Loc.t("Language"), 12, UIStyle.OFFWHITE)
+	language_label.custom_minimum_size = Vector2(180, 0)
+	language_row.add_child(language_label)
+	_language = OptionButton.new()
+	_language.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_language.custom_minimum_size = Vector2(0, 30)
+	_language.add_theme_font_size_override("font_size", 12)
+	_language.add_theme_color_override("font_color", UIStyle.OFFWHITE)
+	_language.add_theme_stylebox_override("normal", UIStyle.panel_box(UIStyle.BG_RAISED, Color(0.35, 0.31, 0.24), 1, 2))
+	_language.add_theme_stylebox_override("hover", UIStyle.panel_box(Color(0.18, 0.18, 0.19), UIStyle.AMBER, 1, 2))
+	for code in Loc.LANGUAGES:
+		_language.add_item(String(Loc.LANGUAGE_NAMES.get(code, code)))
+	_language.item_selected.connect(_on_language_selected)
+	language_row.add_child(_language)
 
 	box.add_child(UIStyle.separator(true))
-	var reset := UIStyle.make_button("RESET CAMPAIGN PROGRESS", false, true)
+	var reset := UIStyle.make_button(Loc.t("RESET CAMPAIGN PROGRESS"), false, true)
 	reset.pressed.connect(_on_reset_pressed)
 	box.add_child(reset)
 
-	var close := UIStyle.make_button("CLOSE", true)
+	var close := UIStyle.make_button(Loc.t("CLOSE"), true)
 	close.custom_minimum_size = Vector2(0, 42)
 	close.pressed.connect(close_panel)
 	box.add_child(close)
 
 	_confirm_reset = ConfirmationDialog.new()
-	_confirm_reset.title = "Reset campaign"
-	_confirm_reset.dialog_text = "Reset all unlocks, stars and campaign totals?\nThis cannot be undone."
-	_confirm_reset.ok_button_text = "RESET"
-	_confirm_reset.cancel_button_text = "CANCEL"
+	_confirm_reset.title = Loc.t("Reset campaign")
+	_confirm_reset.dialog_text = Loc.t("Reset all unlocks, stars and campaign totals?\nThis cannot be undone.")
+	_confirm_reset.ok_button_text = Loc.t("RESET")
+	_confirm_reset.cancel_button_text = Loc.t("CANCEL")
 	_confirm_reset.confirmed.connect(_on_reset_confirmed)
 	add_child(_confirm_reset)
 
@@ -138,6 +157,9 @@ func _load_values() -> void:
 	_muted.button_pressed = GameConfig.as_bool(GameState.settings.get("muted", false))
 	_shake.button_pressed = GameConfig.as_bool(GameState.settings.get("screen_shake", true))
 	_colorblind.button_pressed = GameConfig.as_bool(GameState.settings.get("colorblind", false))
+	if _language != null:
+		var current := Loc.normalize(String(GameState.settings.get("language", Loc.DEFAULT_LANGUAGE)))
+		_language.selected = maxi(0, Loc.LANGUAGES.find(current))
 	_syncing = false
 	_update_value_labels()
 
@@ -157,6 +179,27 @@ func _on_check_toggled(pressed: bool, key: String) -> void:
 		AudioManager.set_muted(pressed)
 
 
+func _on_language_selected(index: int) -> void:
+	if _syncing:
+		return
+	if index < 0 or index >= Loc.LANGUAGES.size():
+		return
+	var code: String = Loc.LANGUAGES[index]
+	GameState.update_setting("language", code)
+	Loc.set_language(code)
+	AudioManager.play_ui("ui_click")
+	var scene := get_tree().current_scene
+	if scene is LevelBase:
+		EventBus.notification.emit(Loc.t("Language will apply after restarting the sector."), UIStyle.AMBER)
+	else:
+		call_deferred("_reload_after_language")
+
+
+func _reload_after_language() -> void:
+	if is_inside_tree():
+		get_tree().reload_current_scene()
+
+
 func _update_value_labels() -> void:
 	if _master_value:
 		_master_value.text = "%d%%" % int(roundf(_master.value))
@@ -174,5 +217,5 @@ func _on_reset_pressed() -> void:
 
 func _on_reset_confirmed() -> void:
 	GameState.reset_campaign()
-	EventBus.notification.emit("Campaign progress reset.", UIStyle.AMBER)
+	EventBus.notification.emit(Loc.t("Campaign progress reset."), UIStyle.AMBER)
 	AudioManager.play_ui("ui_confirm")

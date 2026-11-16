@@ -4,13 +4,18 @@ extends Node2D
 
 @export var level_data: LevelData
 
+const WAVE_CHECKPOINT_VERSION := 1
 const TOWER_IDS: Array[String] = ["pulse", "siege", "flame", "tesla", "missile", "cryo", "rail", "relay", "mine", "orbital"]
 const ENEMY_IDS: Array[String] = ["scout", "worker", "warrior", "spitter", "healer", "burrower", "shieldbearer", "flyer", "elite", "boss"]
+## Abilities are temporarily disabled by user request. Set this back to true and
+## restore the Q/W/E/R/T cases in _on_key() to re-enable the feature.
+const ABILITIES_ENABLED := false
 const ABILITY_SHORTCUTS := {
 	"Q": "orbital_strike", "W": "emp", "E": "reinforcement_drones",
 	"R": "emergency_repair", "T": "supply_drop",
 }
 const ENEMY_VISUAL_SCRIPT := preload("res://scripts/enemies/EnemyVisual.gd")
+const TOWER_VISUAL_SCRIPT := preload("res://scripts/towers/TowerVisual.gd")
 const FX_PATHS := {
 	"muzzle": "res://scenes/fx/MuzzleFlash.tscn",
 	"explosion": "res://scenes/fx/Explosion.tscn",
@@ -116,11 +121,12 @@ func _ready() -> void:
 	EventBus.credits_changed.emit(economy.credits)
 	EventBus.speed_changed.emit(game_speed)
 	EventBus.damage_number.connect(_on_damage_number)
-	EventBus.notification.emit("Sector %d — %s" % [level_data.level_number, level_data.display_name], GameConfig.AMBER)
+	EventBus.notification.emit(Loc.tf("Sector %d — %s", [level_data.level_number, Loc.t(level_data.display_name)]), GameConfig.AMBER)
 	get_tree().create_timer(0.6).timeout.connect(func():
 		if is_inside_tree() and not match_finished:
-			EventBus.notification.emit(level_data.briefing, GameConfig.OFFWHITE)
+			EventBus.notification.emit(Loc.t(level_data.briefing), GameConfig.OFFWHITE)
 	)
+	_restore_wave_checkpoint()
 
 
 func _load_registries() -> void:
@@ -149,6 +155,11 @@ func _preload_assets() -> void:
 	_damage_label_count = 0
 	# Bake all enemy bodies into one atlas once per session.
 	ENEMY_VISUAL_SCRIPT.bake_atlas(self, enemy_registry.values())
+	# Same for tower art: body / deco / turret layers become shared quads.
+	TOWER_VISUAL_SCRIPT.bake_atlas(self, tower_registry.values())
+
+	# Same for tower art: body / deco / turret layers become shared quads.
+
 
 
 func _setup_containers() -> void:
@@ -227,10 +238,10 @@ func _setup_scene_nodes() -> void:
 		grid_overlay.call("setup", self)
 	var gate_a := get_node_or_null("SpawnGateA")
 	if gate_a and gate_a.has_method("setup"):
-		gate_a.call("setup", path.get_start(0), "ENTRY ALPHA")
+		gate_a.call("setup", path.get_start(0), Loc.t("ENTRY ALPHA"))
 	var gate_b := get_node_or_null("SpawnGateB")
 	if gate_b and gate_b.has_method("setup"):
-		gate_b.call("setup", path.get_start(1), "ENTRY BETA")
+		gate_b.call("setup", path.get_start(1), Loc.t("ENTRY BETA"))
 	base_core = get_node_or_null("BaseCore")
 	if base_core and base_core.has_method("setup"):
 		var end_a := path.get_end(0)
@@ -369,16 +380,18 @@ func _on_key(event: InputEventKey) -> void:
 			set_game_speed(2)
 		KEY_F3:
 			set_game_speed(3)
-		KEY_Q:
-			begin_ability("orbital_strike")
-		KEY_W:
-			begin_ability("emp")
-		KEY_E:
-			begin_ability("reinforcement_drones")
-		KEY_R:
-			begin_ability("emergency_repair")
-		KEY_T:
-			begin_ability("supply_drop")
+		# Abilities are temporarily disabled by user request. Restore these
+		# bindings (and ABILITIES_ENABLED) to bring the feature back.
+		# KEY_Q:
+		# 	begin_ability("orbital_strike")
+		# KEY_W:
+		# 	begin_ability("emp")
+		# KEY_E:
+		# 	begin_ability("reinforcement_drones")
+		# KEY_R:
+		# 	begin_ability("emergency_repair")
+		# KEY_T:
+		# 	begin_ability("supply_drop")
 		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0:
 			var index := 9 if event.keycode == KEY_0 else event.keycode - KEY_1
 			if index >= 0 and index < TOWER_IDS.size():
@@ -424,14 +437,14 @@ func _update_hover() -> void:
 
 func select_build_type(tower_id: String) -> void:
 	if not level_data.available_towers.has(tower_id):
-		EventBus.notification.emit("This tower is not available in this sector.", GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.t("This tower is not available in this sector."), GameConfig.WARNING_RED)
 		AudioManager.play_ui("ui_error")
 		return
 	var data: TowerData = tower_registry.get(tower_id, null)
 	if data == null:
 		return
 	if economy.credits < data.cost:
-		EventBus.notification.emit("Not enough credits for %s." % data.display_name, GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.tf("Not enough credits for %s.", [Loc.t(data.display_name)]), GameConfig.WARNING_RED)
 		AudioManager.play_ui("ui_error")
 		return
 	clear_selection()
@@ -457,13 +470,13 @@ func try_place_tower(cell: Vector2i) -> bool:
 	var check := grid.can_build(cell, build_data.cost, economy.credits, true)
 	if not GameConfig.as_bool(check.ok):
 		var reason := String(check.reason)
-		EventBus.notification.emit("Cannot build here: %s" % reason, GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.tf("Cannot build here: %s", [Loc.t(reason)]), GameConfig.WARNING_RED)
 		AudioManager.play_ui("ui_error")
 		ghost.call("flash_error")
 		return false
 	var scene_path := build_data.scene_path
 	if scene_path == "" or not ResourceLoader.exists(scene_path):
-		EventBus.notification.emit("Tower scene is missing: %s" % scene_path, GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.tf("Tower scene is missing: %s", [scene_path]), GameConfig.WARNING_RED)
 		return false
 	if not economy.spend(build_data.cost):
 		return false
@@ -518,7 +531,7 @@ func upgrade_selected() -> void:
 		return
 	if not selected_tower.can_upgrade():
 		AudioManager.play_ui("ui_error")
-		EventBus.notification.emit("Upgrade unavailable or not enough credits.", GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.t("Upgrade unavailable or not enough credits."), GameConfig.WARNING_RED)
 		return
 	selected_tower.upgrade()
 
@@ -557,11 +570,16 @@ func request_next_wave() -> bool:
 
 
 func on_wave_started(_index: int, _total: int, _wave: WaveData) -> void:
+	# The checkpoint belongs to the moment a wave is cleared, never to the
+	# moment the next one is called. Saving here would overwrite the cleared
+	# wave with whatever towers and credits the intermission left behind.
 	simulation_running = true
 
 
-func on_wave_cleared(_index: int, _bonus: int) -> void:
-	stats["waves_cleared"] = int(stats.waves_cleared) + 1
+func on_wave_cleared(index: int, _bonus: int) -> void:
+	# Early calls can finish several waves in one tick, so the wave counter is
+	# taken from the manager instead of being incremented locally.
+	stats["waves_cleared"] = int(index)
 	AudioManager.play_sound("wave_complete", 0.65, 1.0)
 	var relay_income := 0
 	for tower in get_tree().get_nodes_in_group("towers"):
@@ -569,13 +587,140 @@ func on_wave_cleared(_index: int, _bonus: int) -> void:
 			relay_income += int(tower.stats.income_per_wave)
 	if relay_income > 0:
 		economy.add_credits(relay_income, "relay")
-		EventBus.notification.emit("Command Relay stipend: +%d credits" % relay_income, Color(0.55, 0.95, 0.65))
+		EventBus.notification.emit(Loc.tf("Command Relay stipend: +%d credits", [relay_income]), Color(0.55, 0.95, 0.65))
+	# Capture after the wave bonus and relay stipend were paid, so a retry keeps
+	# every credit the player earned for clearing the wave.
+	_capture_wave_checkpoint()
 
 
 func on_all_waves_cleared() -> void:
 	if match_finished:
 		return
 	_trigger_victory()
+
+
+func _capture_wave_checkpoint() -> void:
+	## Remember towers, credits and progress from the last moment the field was
+	## clear. The defeat screen reloads this snapshot instead of the whole sector.
+	if match_finished or level_data == null or waves == null:
+		return
+	var cleared := int(waves.finished_waves)
+	if cleared <= 0 or cleared >= int(waves.total_waves):
+		return
+	var tower_snapshot: Array = []
+	for tower in get_tree().get_nodes_in_group("towers"):
+		if tower == null or not is_instance_valid(tower) or tower.tower_data == null:
+			continue
+		tower_snapshot.append({
+			"id": String(tower.tower_data.id),
+			"cell": [int(tower.cell.x), int(tower.cell.y)],
+			"level": int(tower.current_level),
+			"invested": int(tower.invested),
+			"priority": String(tower.targeting_priority),
+		})
+	GameState.store_wave_checkpoint({
+		"version": WAVE_CHECKPOINT_VERSION,
+		"level_index": level_data.level_number - 1,
+		"waves_cleared": cleared,
+		"elapsed": float(waves.elapsed),
+		"credits": int(economy.credits),
+		"total_earned": int(economy.total_earned),
+		"total_spent": int(economy.total_spent),
+		"base_health": int(base_health),
+		"level_time": float(level_time),
+		"stats": stats.duplicate(true),
+		"towers": tower_snapshot,
+	})
+
+
+func _restore_wave_checkpoint() -> bool:
+	## Called from _ready after a defeat-screen retry reloaded the level scene.
+	## The pending flag makes this a one-shot: ordinary level loads never restore
+	## a snapshot, even if one is still stored for the sector.
+	if not GameState.wave_checkpoint_pending:
+		return false
+	GameState.wave_checkpoint_pending = false
+	if GameState.wave_checkpoint.is_empty():
+		return false
+	var snapshot: Dictionary = GameState.wave_checkpoint
+	if int(snapshot.get("version", 0)) != WAVE_CHECKPOINT_VERSION:
+		return false
+	if int(snapshot.get("level_index", -1)) != level_data.level_number - 1:
+		return false
+	var cleared := clampi(int(snapshot.get("waves_cleared", 0)), 0, int(waves.total_waves))
+	if cleared <= 0 or cleared >= int(waves.total_waves):
+		return false
+
+	waves.started_waves = cleared
+	waves.finished_waves = cleared
+	waves.enemies_alive = 0
+	waves.spawn_queue.clear()
+	waves.elapsed = float(snapshot.get("elapsed", 0.0))
+	waves.wave_victory = false
+	waves.early_calls = 0
+
+	economy.credits = maxi(0, int(snapshot.get("credits", economy.starting_credits)))
+	economy.total_earned = maxi(economy.credits, int(snapshot.get("total_earned", economy.credits)))
+	economy.total_spent = maxi(0, int(snapshot.get("total_spent", 0)))
+	EventBus.credits_changed.emit(economy.credits)
+
+	var saved_stats: Variant = snapshot.get("stats", {})
+	if saved_stats is Dictionary:
+		for key in stats.keys():
+			if (saved_stats as Dictionary).has(key):
+				stats[key] = (saved_stats as Dictionary)[key]
+	stats["waves_cleared"] = cleared
+
+	base_health = clampi(int(snapshot.get("base_health", base_max)), 1, base_max)
+	level_time = float(snapshot.get("level_time", 0.0))
+	EventBus.base_health_changed.emit(base_health, base_max)
+
+	var raw_towers: Variant = snapshot.get("towers", [])
+	if raw_towers is Array:
+		for entry in (raw_towers as Array):
+			if entry is Dictionary:
+				_restore_tower_from_checkpoint(entry)
+
+	EventBus.notification.emit(Loc.tf("Checkpoint restored — wave %d cleared.", [cleared]), GameConfig.AMBER)
+	return true
+
+
+func _restore_tower_from_checkpoint(entry: Dictionary) -> void:
+	var tower_id := String(entry.get("id", ""))
+	var data: TowerData = tower_registry.get(tower_id, null)
+	if data == null:
+		return
+	var raw_cell: Variant = entry.get("cell", null)
+	if not (raw_cell is Array):
+		return
+	var cell_values: Array = raw_cell as Array
+	if cell_values.size() < 2:
+		return
+	var cell := Vector2i(int(cell_values[0]), int(cell_values[1]))
+	if not grid.is_inside(cell) or grid.is_occupied(cell):
+		return
+	if grid.get_state(cell) != GridManager.CellState.BUILDABLE:
+		return
+	var scene_path := String(data.scene_path)
+	if scene_path == "" or not ResourceLoader.exists(scene_path):
+		return
+	var scene: PackedScene = _tower_scenes.get(scene_path)
+	if scene == null:
+		scene = load(scene_path)
+		if scene != null:
+			_tower_scenes[scene_path] = scene
+	if scene == null:
+		return
+	var tower := scene.instantiate()
+	tower_container.add_child(tower)
+	tower.call("setup", self, cell)
+	grid.mark_occupied(cell, tower)
+	tower.set("current_level", clampi(int(entry.get("level", 1)), 1, int(data.max_level)))
+	tower.set("invested", maxi(int(data.cost), int(entry.get("invested", data.cost))))
+	var priority := String(entry.get("priority", "first"))
+	if priority != "":
+		tower.set("targeting_priority", priority)
+	tower.call("_recalculate_stats")
 
 
 func start_next_wave() -> void:
@@ -594,7 +739,7 @@ func _trigger_victory() -> void:
 	stats["base_health"] = base_health
 	stats["base_max"] = base_max
 	stats["time"] = level_time
-	stats["level_name"] = level_data.display_name
+	stats["level_name"] = Loc.t(level_data.display_name)
 	stats["level_number"] = level_data.level_number
 	var stars := GameState.stars_for_integrity(base_health, base_max)
 	var result := GameState.complete_level(stars, stats)
@@ -618,7 +763,7 @@ func _trigger_defeat() -> void:
 	stats["base_health"] = base_health
 	stats["base_max"] = base_max
 	stats["time"] = level_time
-	stats["level_name"] = level_data.display_name
+	stats["level_name"] = Loc.t(level_data.display_name)
 	stats["level_number"] = level_data.level_number
 	var result := GameState.record_failure(stats)
 	AudioManager.play_sound("defeat", 0.8, 1.0)
@@ -635,7 +780,7 @@ func damage_base(amount: int) -> void:
 		return
 	base_health = maxi(0, base_health - amount)
 	EventBus.base_health_changed.emit(base_health, base_max)
-	EventBus.notification.emit("Base integrity -%d" % amount, GameConfig.WARNING_RED)
+	EventBus.notification.emit(Loc.tf("Base integrity -%d", [amount]), GameConfig.WARNING_RED)
 	AudioManager.play_sound("base_damage", 0.75, 0.95)
 	shake(6.0)
 	if base_core and base_core.has_method("flash"):
@@ -649,7 +794,7 @@ func heal_base(amount: int) -> void:
 		return
 	base_health = mini(base_max, base_health + amount)
 	EventBus.base_health_changed.emit(base_health, base_max)
-	EventBus.notification.emit("Base repaired +%d integrity" % amount, Color(0.55, 0.95, 0.65))
+	EventBus.notification.emit(Loc.tf("Base repaired +%d integrity", [amount]), Color(0.55, 0.95, 0.65))
 	if base_core and base_core.has_method("repair_flash"):
 		base_core.call("repair_flash")
 
@@ -657,11 +802,23 @@ func heal_base(amount: int) -> void:
 func handle_enemy_removed(enemy: Node, leaked: bool) -> void:
 	if leaked:
 		stats["leaks"] = int(stats.leaks) + 1
-		damage_base(int(enemy.enemy_data.leak_damage))
+		_force_breach_defeat()
 	else:
 		stats["kills"] = int(stats.kills) + 1
-	if waves:
+	if waves and not match_finished:
 		waves.on_enemy_removed()
+
+
+func _force_breach_defeat() -> void:
+	## One breach is enough: the base is lost the moment any arachnid gets through.
+	base_health = 0
+	EventBus.base_health_changed.emit(0, base_max)
+	EventBus.notification.emit(Loc.t("BREACH! One arachnid reached the base."), GameConfig.WARNING_RED)
+	AudioManager.play_sound("base_damage", 0.9, 0.85)
+	shake(10.0)
+	if base_core and base_core.has_method("flash"):
+		base_core.call("flash")
+	_trigger_defeat()
 
 
 func spawn_enemy(enemy_id: String, path_id: int) -> bool:
@@ -683,11 +840,11 @@ func spawn_enemy(enemy_id: String, path_id: int) -> bool:
 	enemy_container.add_child(enemy)
 	enemy.call("setup", self, path_id)
 	if data.is_boss:
-		EventBus.notification.emit("BROOD TYRANT DETECTED", GameConfig.WARNING_RED)
-		EventBus.boss_phase.emit("The Brood Tyrant enters the field!")
+		EventBus.notification.emit(Loc.t("BROOD TYRANT DETECTED"), GameConfig.WARNING_RED)
+		EventBus.boss_phase.emit(Loc.t("The Brood Tyrant enters the field!"))
 		AudioManager.play_sound("boss_roar", 0.8, 0.9)
 	elif data.is_elite:
-		EventBus.notification.emit("Arachnid Elite approaching!", GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.t("Arachnid Elite approaching!"), GameConfig.WARNING_RED)
 	return true
 
 
@@ -710,14 +867,16 @@ func summon_reinforcements(path_id: int, enemy_id: String, count: int, progress_
 
 
 func begin_ability(ability_id: String) -> void:
+	if not ABILITIES_ENABLED:
+		return
 	if match_finished:
 		return
 	if not abilities.is_unlocked(ability_id):
-		EventBus.notification.emit("Ability not unlocked in this sector.", GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.t("Ability not unlocked in this sector."), GameConfig.WARNING_RED)
 		AudioManager.play_ui("ui_error")
 		return
 	if not abilities.can_use(ability_id):
-		EventBus.notification.emit("Ability is cooling down or out of charges.", GameConfig.WARNING_RED)
+		EventBus.notification.emit(Loc.t("Ability is cooling down or out of charges."), GameConfig.WARNING_RED)
 		AudioManager.play_ui("ui_error")
 		return
 	var ability: AbilityData = abilities.get_ability(ability_id)
@@ -730,7 +889,7 @@ func begin_ability(ability_id: String) -> void:
 	ability_preview.visible = true
 	ability_preview.call("set_ability", ability)
 	ability_preview.global_position = get_global_mouse_position()
-	EventBus.notification.emit("Select a target area for %s." % ability.display_name, ability.color)
+	EventBus.notification.emit(Loc.tf("Select a target area for %s.", [Loc.t(ability.display_name)]), ability.color)
 	AudioManager.play_ui("ui_confirm")
 
 
@@ -792,7 +951,7 @@ func ability_repair_base(amount: int) -> void:
 
 func ability_supply_drop(credits: int) -> void:
 	economy.add_credits(credits, "supply drop")
-	EventBus.notification.emit("Supply drop recovered: +%d credits" % credits, Color(0.95, 0.8, 0.3))
+	EventBus.notification.emit(Loc.tf("Supply drop recovered: +%d credits", [credits]), Color(0.95, 0.8, 0.3))
 	if base_core:
 		spawn_fx_at("heal", base_core.global_position, Color(0.95, 0.85, 0.35), 55.0)
 	AudioManager.play_sound("ability_supply", 0.7, 1.0)
@@ -909,7 +1068,7 @@ func set_game_speed(speed: int) -> void:
 	GameState.settings["speed"] = game_speed
 	GameState.save_to_disk()
 	EventBus.speed_changed.emit(game_speed)
-	EventBus.notification.emit("Game speed: %dx" % game_speed, GameConfig.AMBER)
+	EventBus.notification.emit(Loc.tf("Game speed: %dx", [game_speed]), GameConfig.AMBER)
 
 
 func toggle_pause() -> void:
@@ -935,7 +1094,7 @@ func _toggle_mute() -> void:
 	var now_muted := not GameConfig.as_bool(GameState.settings.get("muted", false))
 	GameState.update_setting("muted", now_muted)
 	AudioManager.set_muted(now_muted)
-	EventBus.notification.emit("Audio muted" if now_muted else "Audio unmuted", GameConfig.AMBER)
+	EventBus.notification.emit(Loc.t("Audio muted") if now_muted else Loc.t("Audio unmuted"), GameConfig.AMBER)
 
 
 func is_position_on_map(position: Vector2) -> bool:

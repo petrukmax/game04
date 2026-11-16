@@ -15,8 +15,8 @@ was actually run or measured; nothing below claims a human playtest that did not
 | Area | Verdict | Evidence |
 | --- | --- | --- |
 | Campaign (15 sectors) | Working | `FairPlayTest`: 15/15 victories on the normal economy; `PlaythroughTest`: 15/15 |
-| Mechanics | Working | `TestRunner`: 663 checks, 0 failures |
-| UI and flows | Working | `FlowTest`: 35 checks, 0 failures; rendered captures at 1600×900 and 1280×720 |
+| Mechanics | Working | `TestRunner`: 664 checks, 0 failures |
+| UI and flows | Working | `FlowTest`: 43 checks, 0 failures; rendered captures at 1600×900 and 1280×720 |
 | Restart/pause lifecycle | Working | `RestartTest`: real scene reload, OK |
 | Save/load | Working | `FlowTest` persistence checks; browser reload kept the changed volume |
 | Audio | Working | 37 generated WAVs; mute/volume wired and persisted |
@@ -41,7 +41,8 @@ was actually run or measured; nothing below claims a human playtest that did not
 | Economy | Starting credits, kill/wave income, early bonus, 70% refund; fair-play bot wins all sectors | Real resource pressure | P1 | Keep | No duplicate rewards; all sectors affordable | Working |
 | Abilities | 5 abilities with cooldowns, charges and area targeting; pause-safe timers | Clutch tools in late sectors | P1 | Keep | Cooldowns freeze while paused and reset on restart | Working |
 | HUD and shop | Credits, integrity, sector, wave preview, speed, pause, 10 cards, ability bar | Readable command console | P1 | Keep | Legible at 1600×900 and 1280×720 | Working |
-| Menus and flows | Main menu, sector select, settings, manual, pause, victory, defeat | Complete campaign loop | P1 | Keep | `FlowTest` 35/35; screenshots 01–11 | Working |
+| Menus and flows | Main menu, sector select, settings, manual, pause, victory, defeat | Complete campaign loop | P1 | Keep | `FlowTest` 43/43; screenshots 01–11 | Working |
+| Wave checkpoint retry | The defeat screen can retry the failed wave from a snapshot of towers, upgrades, credits and statistics taken at the end of the last cleared wave; `FlowTest` restores and verifies it | Less punishing retries without replaying cleared waves | P1 | New | `FlowTest` checkpoint checks pass | Working |
 | Pause/resume | Simulation, timers and cooldowns freeze; resume restores state | Fair interruptions | P1 | Keep | `FlowTest` pause checks | Working |
 | Restart lifecycle | Scene reload clears units, projectiles, FX and signals | Safe retries | P1 | Keep | `RestartTest` reports OK | Working |
 | Persistence | Versioned JSON in `user://`; validation and corrupt-file recovery; browser stores it in IndexedDB | Progress survives sessions | P1 | Keep | `FlowTest` save checks; browser volume persisted after reload | Working |
@@ -61,10 +62,10 @@ All commands were run from the repository root with the local Godot 4.7.2 consol
 
 ```text
 godot --headless --path . --fixed-fps 60 res://tests/TestRunner.tscn
-  RESULT: 663 checks, 0 failures
+  RESULT: 664 checks, 0 failures
 
 godot --headless --path . --fixed-fps 60 res://tests/FlowTest.tscn
-  RESULT: 35 checks, 0 failures (settings, mute, pause, victory/defeat wiring)
+  RESULT: 43 checks, 0 failures (settings, mute, pause, victory/defeat and wave-checkpoint wiring)
 
 godot --headless --path . --fixed-fps 60 res://tests/RestartTest.tscn
   RESTART RESULT: OK

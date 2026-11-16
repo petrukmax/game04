@@ -1,5 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/TooltipController.gd" id="res_TooltipController"]
-[node name="Tooltip" type="PanelContainer"]
+
+[node name="Tooltip" type="Panel"]
 script = ExtResource("res_TooltipController")

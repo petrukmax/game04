@@ -19,6 +19,10 @@ Run it locally over HTTP (browsers refuse WebAssembly modules from `file://`):
 
 - **Windows:** double-click `start.bat`. It starts the server and opens the browser.
 - **macOS / Linux:** run `./start.sh` (or `node tools/serve.mjs 8787 --open`).
+- **Restart a running server:** `restart.bat` (Windows) or `./restart.sh` (macOS / Linux).
+  They stop only this project's server on port 8787 and start it again.
+
+For copy-paste commands (start, restart, stop, health check), see **`QUICKSTART.md`**.
 
 Or start the server yourself:
 
@@ -145,6 +149,7 @@ HUD buttons also expose Send Wave, speed control and pause. Buttons are sized fo
 - **10 towers**, each with three upgrades: Pulse Turret, Siege Cannon, Flame Vent, Arc Coil, Missile Battery, Cryo Emitter, Rail Sniper, Command Relay, Mine Layer and Orbital Lance.
 - **10 enemy types**: Dust Scout, Regolith Worker, Marauder, Acid Spitter, Brood Nurse, Burrower, Shieldbearer, Sand Flyer, Elite Ravager and the Brood Tyrant boss.
 - **5 abilities** with cooldowns and limited charges, unlocked progressively.
+- **Wave checkpoints**: the run is saved the moment a wave is cleared; after a breach the defeat screen can retry the failed wave with every tower, upgrade and credit restored to that end-of-wave state.
 - Stars are awarded from remaining base integrity. Each sector unlocks the next on victory.
 
 ## Project structure
@@ -153,6 +158,8 @@ HUD buttons also expose Send Wave, speed control and pause. Buttons are sized fo
 project.godot              Project settings, autoloads, input map, 1600x900 viewport
 index.html                 Browser launcher for GitHub Pages (embeds the Web build)
 start.bat / start.sh       One-click local server and browser (Windows / macOS+Linux)
+restart.bat / restart.sh   Stop this project's local server and start it again
+QUICKSTART.md              Short start / restart / stop cheat sheet
 web/                       Godot Web export served by GitHub Pages
 .nojekyll                  Tells GitHub Pages not to run Jekyll
 .gitattributes             Keeps wasm/pck/images byte-exact in git
@@ -190,7 +197,7 @@ tests/
   TestRunner.tscn          Mechanics and resource suite
   PlaythroughTest.tscn     All-level victory check with test-only funding
   FairPlayTest.tscn        All-level victory check using only normal economy
-  FlowTest.tscn            Settings persistence, mute, pause, victory/defeat wiring
+  FlowTest.tscn            Settings persistence, mute, pause, victory/defeat and wave-checkpoint wiring
   RestartTest.tscn         Real scene-reload restart check
   ScreenshotTest.tscn      Rendered UI captures
   PerfTest.tscn            Dense late-campaign timing benchmark (Sector 15)

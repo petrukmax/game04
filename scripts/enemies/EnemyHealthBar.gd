@@ -86,7 +86,7 @@ func _draw() -> void:
 
 	if enemy.enemy_data.is_boss:
 		var font := ThemeDB.fallback_font
-		draw_string(font, Vector2(-width * 0.5, y - 9.0), "BROOD TYRANT",
+		draw_string(font, Vector2(-width * 0.5, y - 9.0), Loc.t("BROOD TYRANT"),
 			HORIZONTAL_ALIGNMENT_CENTER, width, 11, Color(1.0, 0.4, 0.3))
 
 

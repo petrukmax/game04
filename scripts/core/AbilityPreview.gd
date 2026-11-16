@@ -33,5 +33,5 @@ func _draw() -> void:
 			Color(col.r, col.g, col.b, 0.8), 2.0, true)
 	draw_circle(Vector2.ZERO, 7.0, Color(col.r, col.g, col.b, 0.65))
 	var font := ThemeDB.fallback_font
-	draw_string(font, Vector2(-radius, -radius - 12), ability.display_name,
+	draw_string(font, Vector2(-radius, -radius - 12), Loc.t(ability.display_name),
 		HORIZONTAL_ALIGNMENT_CENTER, radius * 2.0, 16, Color(col.r, col.g, col.b, 0.95))
